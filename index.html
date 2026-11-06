@@ -1,0 +1,1397 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Content Studio</title>
+<meta name="theme-color" content="#F6F2EC">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Studio">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+<style>
+:root{
+  --bg:#F6F2EC; --surface:#FFFFFF; --surface-2:#EFE8DF; --ink:#2F2924; --muted:#776A5F;
+  --line:#E3D9CD; --accent:#8F755C; --accent-ink:#FFFFFF; --accent-soft:#E9DED1;
+  --warn-bg:#F7E9D7; --warn-ink:#7A4E1C; --danger:#9C4434; --focus:#5E4A38; --sel:#2F6FDE;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#1D1A17; --surface:#27231F; --surface-2:#312B26; --ink:#F2ECE4; --muted:#B4A799;
+    --line:#3E3730; --accent:#CDB295; --accent-ink:#1D1A17; --accent-soft:#3A322A;
+    --warn-bg:#3B2E1E; --warn-ink:#F0CF9F; --danger:#E5937F; --focus:#E8D3B8; --sel:#7FA8F0;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#1D1A17; --surface:#27231F; --surface-2:#312B26; --ink:#F2ECE4; --muted:#B4A799;
+  --line:#3E3730; --accent:#CDB295; --accent-ink:#1D1A17; --accent-soft:#3A322A;
+  --warn-bg:#3B2E1E; --warn-ink:#F0CF9F; --danger:#E5937F; --focus:#E8D3B8; --sel:#7FA8F0;
+  color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:inherit}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:'Jost',system-ui,-apple-system,'Segoe UI',sans-serif;font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- shell ---------- */
+.app{display:grid;grid-template-columns:232px minmax(0,1fr);min-height:100%}
+.side{border-right:1px solid var(--line);padding:28px 16px;display:flex;flex-direction:column;gap:28px;position:sticky;top:0;height:100vh;height:100dvh}
+.brandmark{padding:0 10px}
+.brandmark .name{font-family:'Playfair Display',Georgia,serif;font-size:24px;line-height:1.1;font-weight:500}
+.brandmark .sub{color:var(--muted);font-size:13px;margin-top:4px}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;border:0;background:none;padding:11px 12px;border-radius:10px;cursor:pointer;font-size:15px}
+.nav button:hover{background:var(--surface-2)}
+.nav button[aria-current="page"]{background:var(--surface);box-shadow:inset 0 0 0 1px var(--line);font-weight:500}
+.nav .count{font-size:12px;color:var(--muted);min-width:22px;text-align:right}
+.side .status{margin-top:auto;font-size:12px;color:var(--muted);padding:0 10px}
+main{min-width:0;padding:32px clamp(16px,3.5vw,44px) 64px}
+main:focus{outline:none}
+.view-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:26px}
+.view-head h1{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0}
+.view-head p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+
+.btn{border:1px solid var(--line);background:var(--surface);padding:9px 16px;border-radius:999px;cursor:pointer;font-size:14px;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ghost{background:none;border-color:transparent}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.small{padding:6px 12px;font-size:13px}
+.btn.danger{color:var(--danger)}
+.btn[disabled]{opacity:.45;cursor:default}
+.empty{border:1px dashed var(--line);border-radius:16px;padding:40px;text-align:center;color:var(--muted)}
+.empty h2{font-family:'Playfair Display',Georgia,serif;font-weight:500;color:var(--ink);margin:0 0 6px;font-size:22px}
+.badge{font-size:12px;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink);white-space:nowrap}
+.badge.warn-b{background:var(--warn-bg);color:var(--warn-ink)}
+.badge.ok{background:var(--accent-soft)}
+
+/* ---------- design grid ---------- */
+.car-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px;align-items:start}
+.car-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.car-card .open{border:0;background:none;padding:0;text-align:left;cursor:pointer;display:block;width:100%}
+.car-card .open:hover .t{text-decoration:underline}
+.car-card .meta{padding:12px 14px 4px}
+.car-card .t{font-weight:500;line-height:1.3}
+.car-card .m{font-size:13px;color:var(--muted);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.car-card .acts{display:flex;gap:4px;padding:6px 8px 10px;flex-wrap:wrap}
+
+/* ---------- slide frames ---------- */
+.frame{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;background:#E9E1D6}
+.frame.fmt-story{aspect-ratio:9/16}
+.frame > .brand-scope{position:absolute;top:0;left:0;width:1080px;height:1350px;transform-origin:top left;transform:scale(var(--s,.2))}
+.frame.fmt-story > .brand-scope{height:1920px}
+
+/* ---------- editor ---------- */
+.ed-top{display:flex;flex-direction:column;gap:12px;margin-bottom:18px}
+.ed-top .r1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ed-top .title-input{flex:1 1 240px;min-width:0;border:0;border-bottom:1px solid transparent;background:none;font-family:'Playfair Display',Georgia,serif;font-size:clamp(22px,3vw,30px);padding:4px 0}
+.ed-top .title-input:hover,.ed-top .title-input:focus{border-bottom-color:var(--line);outline:none}
+.ed-top .r2{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.ed-top .r2 .spacer{flex:1}
+.stepper{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:3px 4px 3px 12px;background:var(--surface);font-size:14px}
+.stepper button{width:32px;height:32px;border-radius:50%;border:0;background:var(--surface-2);cursor:pointer;font-size:18px;line-height:1}
+.stepper input{width:44px;text-align:center;border:0;background:none;font-size:15px;-moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.ed-body{display:grid;grid-template-columns:128px minmax(0,1fr) 340px;gap:22px;align-items:start}
+.ed-body.single{grid-template-columns:minmax(0,1fr) 340px}
+.thumbs{display:flex;flex-direction:column;gap:10px;position:sticky;top:16px;max-height:calc(100dvh - 32px);overflow:auto;padding:3px}
+.thumb{position:relative;border:0;padding:0;background:none;cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px var(--line);flex:0 0 auto}
+.thumb[aria-current="true"]{box-shadow:0 0 0 3px var(--accent)}
+.thumb .num{position:absolute;left:6px;top:6px;z-index:2;background:var(--surface);color:var(--ink);font-size:11px;line-height:1;padding:4px 6px;border-radius:6px}
+.add-slide{border:1px dashed var(--line);background:none;border-radius:10px;padding:12px 6px;cursor:pointer;color:var(--muted);font-size:13px;flex:0 0 auto}
+.add-slide:hover{border-color:var(--accent);color:var(--ink)}
+.stage{display:flex;flex-direction:column;gap:12px;align-items:center;min-width:0}
+.stage #stage-frame{width:100%;max-width:520px;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.stage #stage-frame.fmt-story{max-width:340px}
+.stage .frame{border-radius:14px;box-shadow:0 20px 50px rgba(47,41,36,.14)}
+.stage-nav{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:14px}
+.tools{width:100%;max-width:560px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}
+.tools .tl{flex:1 1 100%;font-size:13px;color:var(--muted)}
+.tools .tl b{color:var(--ink);font-weight:500}
+.tgroup{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden}
+.tgroup button{border:0;background:var(--surface);padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:13px}
+.tgroup button+button{border-left:1px solid var(--line)}
+.tgroup button:hover{background:var(--surface-2)}
+.tgroup svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.warn{background:var(--warn-bg);color:var(--warn-ink);border-radius:12px;padding:12px 14px;font-size:14px;max-width:560px;width:100%}
+.fields{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:flex;flex-direction:column;gap:14px;position:sticky;top:16px;max-height:calc(100dvh - 32px);overflow:auto}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label,.field .lbl{font-size:13px;color:var(--muted)}
+.field input[type=text],.field input[type=url],.field input[type=date],.field select,.field textarea{width:100%;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:9px 11px;font-size:14px}
+.field textarea{resize:vertical;min-height:64px;line-height:1.45}
+.field .hint{font-size:12px;color:var(--muted)}
+.seg{display:flex;flex-wrap:wrap;gap:6px}
+.seg button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 11px;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.seg button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.sw{width:12px;height:12px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(0,0,0,.15)}
+.slide-tools{display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:14px}
+
+/* ---------- photos ---------- */
+.ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
+.ph-tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+.ph-tile.is-used .ph-img{opacity:.8}
+.ph-used{position:absolute;top:8px;left:8px;z-index:1;background:var(--ink);color:var(--bg);font-size:12px;line-height:1;padding:6px 10px;border-radius:999px}
+.ph-move{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 10px;font-size:13px;max-width:100%}
+.ph-sub{color:var(--muted);font-size:14px;margin:-8px 0 18px}
+.pk-used{position:absolute;left:6px;top:6px;background:var(--ink);color:var(--bg);font-size:11px;line-height:1;padding:4px 7px;border-radius:999px}
+@media (pointer:coarse){.ph-move{min-height:40px;font-size:16px}}
+.ph-img{aspect-ratio:4/5;background:var(--surface-2) center/cover no-repeat}
+.ph-acts{display:flex;gap:4px;padding:8px;flex-wrap:wrap;align-items:center}
+.picker{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;max-height:50vh;overflow:auto;margin:6px 0 14px}
+.picker button{position:relative;border:0;padding:0;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:4/5;background:var(--surface-2) center/cover no-repeat;box-shadow:0 0 0 1px var(--line)}
+.picker button:hover,.picker button:focus-visible{box-shadow:0 0 0 3px var(--accent)}
+
+/* ---------- ideas ---------- */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.chips button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.idea-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:18px}
+.idea{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.idea h2{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:21px;line-height:1.25;margin:0}
+.idea .hook{font-style:italic;color:var(--muted);margin:0}
+.idea ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:14px}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.sources{font-size:13px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 12px}
+.idea .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+details.more summary{cursor:pointer;font-size:13px;color:var(--muted);padding:4px 0}
+.panel-box{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:24px}
+.panel-box h2{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:20px;margin:0 0 4px}
+.panel-box p{margin:0 0 14px;color:var(--muted);font-size:14px}
+.suggest{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;margin-top:16px}
+.suggest .s{border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;font-size:14px}
+.suggest .s b{font-weight:500}
+.pill-input{flex:1 1 260px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:9px 16px;min-width:0}
+
+/* ---------- used ---------- */
+.used-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.used-table{width:100%;border-collapse:collapse;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.used-table th,.used-table td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);font-size:14px;vertical-align:top}
+.used-table th{font-weight:500;color:var(--muted);font-size:13px;background:var(--surface-2)}
+.used-table tr:last-child td{border-bottom:0}
+
+/* ---------- brand settings ---------- */
+.brand-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:28px;align-items:start}
+.brand-form{display:flex;flex-direction:column;gap:22px}
+.brand-form section{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px;display:flex;flex-direction:column;gap:14px}
+.brand-form h2{font-family:'Playfair Display',Georgia,serif;font-weight:500;font-size:20px;margin:0}
+.colors{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.color{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;background:var(--bg)}
+.color input[type=color]{width:38px;height:38px;border:0;padding:0;background:none;border-radius:8px;cursor:pointer}
+.color .c-lbl{font-size:12px;color:var(--muted)}
+.color input[type=text]{width:90px;border:0;background:none;font-size:14px;padding:0}
+.brand-preview{display:grid;grid-template-columns:1fr 1fr;gap:12px;position:sticky;top:16px}
+.brand-preview .frame{border-radius:12px}
+.headshot-row{display:flex;align-items:center;gap:14px}
+.headshot-row .hs{width:64px;height:64px;border-radius:50%;background:var(--surface-2) center/cover no-repeat;border:1px solid var(--line)}
+
+/* ---------- dialog / toast ---------- */
+dialog{border:1px solid var(--line);border-radius:18px;background:var(--surface);color:var(--ink);padding:24px;width:min(580px,calc(100vw - 32px));max-height:calc(100dvh - 40px)}
+dialog::backdrop{background:rgba(29,26,23,.45)}
+dialog h2{font-family:'Playfair Display',Georgia,serif;font-weight:500;margin:0 0 14px;font-size:24px}
+dialog form{display:flex;flex-direction:column;gap:14px}
+dialog .row.end{justify-content:flex-end;margin-top:6px}
+.dl-opts{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.dl-opt{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;border:1px solid var(--line);background:var(--bg);border-radius:14px;padding:14px 16px;cursor:pointer}
+.dl-opt:hover{border-color:var(--accent)}
+.dl-opt b{font-weight:500;font-size:15px}
+.dl-opt span{font-size:13px;color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:999px;font-size:14px;z-index:50;box-shadow:0 10px 30px rgba(0,0,0,.2);max-width:calc(100vw - 32px);text-align:center}
+.spinner{display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){.spinner{animation:none}}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ---------- touch (iPad) ---------- */
+@media (pointer:coarse){
+  .btn{min-height:44px;padding:10px 18px}
+  .btn.small{min-height:40px;padding:8px 14px}
+  .seg button,.tgroup button{min-height:42px;padding:8px 14px}
+  .chips button{min-height:40px}
+  .nav button{min-height:48px}
+  .stepper button{width:40px;height:40px}
+  .field input[type=text],.field input[type=url],.field input[type=date],.field select,.field textarea,.pill-input,.stepper input,.color input[type=text]{font-size:16px}
+  .thumb .num{font-size:13px}
+}
+
+/* ---------- responsive ---------- */
+@media (max-width:1279px){
+  .app{grid-template-columns:200px minmax(0,1fr)}
+  .ed-body,.ed-body.single{grid-template-columns:minmax(0,1fr) 320px}
+  .ed-body .thumbs{grid-column:1 / -1;flex-direction:row;position:static;max-height:none;overflow-x:auto;overflow-y:hidden;padding:3px 3px 8px;-webkit-overflow-scrolling:touch}
+  .ed-body .thumbs .thumb{width:84px}
+  .ed-body .thumbs .thumb.story{width:58px}
+  .ed-body .thumbs .add-slide{width:84px}
+  .brand-grid{grid-template-columns:1fr}
+  .brand-preview{position:static;max-width:520px}
+}
+@media (max-width:899px){
+  .app{grid-template-columns:1fr}
+  .side{position:sticky;top:env(safe-area-inset-top,0px);height:auto;flex-direction:row;align-items:center;padding:8px 12px;gap:12px;border-right:0;border-bottom:1px solid var(--line);background:var(--bg);z-index:10;overflow-x:auto}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+  .brandmark,.side .status{display:none}
+  .nav{flex-direction:row}
+  .nav button{white-space:nowrap;padding:8px 12px}
+  .nav .count{display:none}
+  .ed-body,.ed-body.single{grid-template-columns:1fr}
+  .stage{order:1}
+  .ed-body .thumbs{order:2}
+  .fields{order:3;position:static;max-height:none}
+  .idea-list{grid-template-columns:1fr}
+}
+
+/* =========================================================
+   SLIDE DESIGN (1080 wide, rendered full size and scaled)
+   ========================================================= */
+.brand-scope{
+  --b-bg:#EAE1D5; --b-card:#FFFFFF; --b-accent:#A68C72; --b-ink:#2E2823; --b-soft:#F5F0E9;
+  --b-display:'Playfair Display',Georgia,serif; --b-body:'Jost',system-ui,sans-serif; --b-script:var(--b-display);
+}
+.slide{position:relative;width:1080px;height:1350px;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--b-body);color:var(--b-ink);background:var(--b-bg)}
+.slide.fmt-story{height:1920px}
+.slide.bg-sand{background:var(--b-bg)}
+.slide.bg-white{background:var(--b-card)}
+.slide.bg-taupe{background:var(--b-accent);color:var(--b-card)}
+.slide.bg-ink{background:var(--b-ink);color:var(--b-card)}
+.slide.bg-photo{background:linear-gradient(160deg,var(--b-soft) 0%,var(--b-bg) 55%,var(--b-accent) 140%)}
+.slide .ph{position:absolute;inset:0;background-size:cover;background-position:center}
+.slide .ph-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0) 40%,rgba(0,0,0,.12) 100%)}
+.slide .panel{position:relative;z-index:1;width:100%;padding:130px 110px 170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px}
+.slide.fmt-story .panel{padding:300px 110px 400px}
+.slide.bg-photo .panel,.slide.fmt-story.bg-photo .panel{width:auto;max-width:860px;margin:0 110px;padding:84px 76px 64px;background:var(--b-card);color:var(--b-ink);border-radius:44px;box-shadow:0 34px 90px rgba(30,24,18,.22);gap:28px}
+.slide .h{font-family:var(--b-display);font-weight:500;line-height:1.04;letter-spacing:-.012em;margin:0;text-wrap:balance}
+.slide .acc{font-family:var(--b-script);font-style:italic;font-weight:400;line-height:1.15;margin:-6px 0 0;text-wrap:balance;opacity:.92}
+.slide .acc.script{font-style:normal}
+.slide .body{font-size:38px;line-height:1.45;font-weight:400;margin:0;max-width:800px;text-wrap:balance;opacity:.86}
+.slide .rule{width:120px;height:2px;background:currentColor;opacity:.35;flex:0 0 auto}
+.slide .pill{display:inline-block;padding:22px 52px;border-radius:60px;background:var(--b-accent);color:var(--b-card);font-size:30px;font-weight:500;letter-spacing:.02em}
+.slide.bg-taupe .pill,.slide.bg-ink .pill{background:var(--b-card);color:var(--b-ink)}
+.slide .items{display:flex;flex-direction:column;gap:20px;width:100%;max-width:820px}
+.slide .item{background:var(--b-card);color:var(--b-ink);border-radius:60px;padding:24px 44px;font-size:34px;line-height:1.3;text-wrap:balance;box-shadow:0 8px 24px rgba(30,24,18,.06)}
+.slide.bg-white .item,.slide.bg-photo .item{background:var(--b-soft);box-shadow:none}
+.slide .steps{display:flex;flex-direction:column;gap:30px;width:100%;max-width:820px;margin:0;padding:0;list-style:none}
+.slide .steps li{display:flex;flex-direction:column;align-items:center;gap:12px;font-size:34px;line-height:1.3;text-wrap:balance}
+.slide .steps .n{width:64px;height:64px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:var(--b-display);font-size:30px;opacity:.85}
+.slide .big{font-family:var(--b-display);font-weight:500;line-height:.95;letter-spacing:-.02em;margin:0}
+.slide .mf{display:flex;flex-direction:column;gap:24px;width:100%;max-width:820px}
+.slide .mf .card{border-radius:36px;padding:38px 48px;display:flex;flex-direction:column;gap:12px;align-items:center}
+.slide .mf .card.myth{background:transparent;border:2px solid currentColor;opacity:.75}
+.slide .mf .card.fact{background:var(--b-card);color:var(--b-ink)}
+.slide.bg-white .mf .card.fact,.slide.bg-photo .mf .card.fact{background:var(--b-soft)}
+.slide .mf .lbl{font-family:var(--b-script);font-style:italic;font-size:40px}
+.slide .mf .lbl.script{font-style:normal}
+.slide .mf .txt{font-size:36px;line-height:1.35;text-wrap:balance}
+.slide .headshot{width:280px;height:280px;border-radius:50%;background:var(--b-soft) center/cover no-repeat;border:10px solid var(--b-card);box-shadow:0 16px 40px rgba(30,24,18,.16);flex:0 0 auto}
+.slide .sig{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:28px;line-height:1.4}
+.slide .sig b{font-family:var(--b-display);font-weight:500;font-size:36px}
+.slide .sig span{opacity:.8}
+.slide .foot{position:absolute;left:0;right:0;bottom:58px;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:24px;letter-spacing:.06em;padding:0 120px}
+.slide.fmt-story .foot{bottom:300px}
+.slide .foot span{opacity:.72}
+.slide .foot .fn{letter-spacing:0;font-size:22px;text-wrap:balance;opacity:.65}
+.slide .foot-in{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:22px;letter-spacing:.05em;margin-top:6px}
+.slide .foot-in span{opacity:.65}
+.slide .foot-in .fn{letter-spacing:0;font-size:20px;text-wrap:balance}
+.slide .al-left{align-self:flex-start;text-align:left;align-items:flex-start}
+.slide .al-right{align-self:flex-end;text-align:right;align-items:flex-end}
+.slide .al-center{align-self:center;text-align:center;align-items:center}
+.slide .foot.al-left,.slide .foot.al-right{align-self:auto}
+.live [data-el]{cursor:grab;touch-action:none}
+.live [data-el]:active{cursor:grabbing}
+.live .is-sel{outline:8px dashed var(--sel-slide,#2F6FDE);outline-offset:16px}
+@media (hover:hover){.live [data-el]:not(.is-sel):hover{outline:5px dashed rgba(47,111,222,.4);outline-offset:16px}}
+.export-host{position:fixed;top:0;left:-20000px;width:1080px;pointer-events:none}
+.export-host .slide *{box-shadow:none !important}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brandmark"><div class="name" id="bm-name">Content Studio</div><div class="sub">Posts, carousels and ideas</div></div>
+    <nav class="nav" aria-label="Sections">
+      <button data-nav="carousels"><span>Carousels</span><span class="count" id="n-car"></span></button>
+      <button data-nav="singles"><span>Single posts</span><span class="count" id="n-single"></span></button>
+      <button data-nav="photos"><span>Photos</span><span class="count" id="n-photos"></span></button>
+      <button data-nav="ideas"><span>Idea research</span><span class="count" id="n-ideas"></span></button>
+      <button data-nav="used"><span>Used ideas</span><span class="count" id="n-used"></span></button>
+      <button data-nav="brand"><span>Brand settings</span><span class="count"></span></button>
+    </nav>
+    <div class="status" id="store-status">Connecting…</div>
+  </aside>
+  <main id="main" tabindex="-1"></main>
+</div>
+<dialog id="dlg"></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+
+<script>
+/* =========================== constants =========================== */
+const DEFAULT_BRAND = {
+  name:'', handle:'@yourhandle', extra:'',
+  bg:'#EAE1D5', card:'#FFFFFF', accent:'#A68C72', ink:'#2E2823', soft:'#F5F0E9',
+  displayFont:'Playfair Display', bodyFont:'Jost', scriptFont:'',
+  headshotId:'', headshotData:'', fontFiles:[]
+};
+const DIM = {post:{w:1080,h:1350,label:'Post 4:5'}, story:{w:1080,h:1920,label:'Story 9:16'}};
+const LAYOUTS = {cover:'Cover', statement:'Statement', list:'List', steps:'Steps', stat:'Big number', mythfact:'Myth vs fact', cta:'Call to action'};
+const BGS = {photo:'Photo', sand:'Sand', white:'White', taupe:'Accent', ink:'Deep'};
+const STATUS = {research:'Researched', scripted:'Scripted', designed:'Designed', unverified:'Needs fact-check'};
+const FORMATS = ['Reel','Carousel','Single post','Story'];
+const PHOTO_CATS = {interior:'Interior', nature:'Nature', abstract:'Abstract'};
+const ELNAME = {heading:'Headline', accent:'Italic line', body:'Body text', button:'Button', items:'List', number:'Big number', myth:'Myth card', fact:'Fact card', headshot:'Headshot', sig:'Your name', rule:'Divider line', foot:'Handle and small print'};
+const ICON = {
+  left:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 10h10M4 14h16M4 18h10"/></svg>',
+  center:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 10h10M4 14h16M7 18h10"/></svg>',
+  right:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M10 10h10M4 14h16M10 18h10"/></svg>'
+};
+
+const S = {
+  view:'carousels', brand:{...DEFAULT_BRAND}, ideas:[], carousels:[], photos:[],
+  loaded:{ideas:false,carousels:false}, editing:null, slideIdx:0, sel:null, ideaFilter:'all',
+  usedQuery:'', bsTheme:'', photoCat:'interior', pickCat:'all', suggestions:[], busy:{}, caps:{}, mode:'loading'
+};
+
+/* =========================== helpers =========================== */
+const $ = (s,r=document)=>r.querySelector(s);
+const esc = s => String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const br = s => esc(s).replace(/\n/g,'<br>');
+const uid = p => p + Date.now().toString(36) + Math.random().toString(36).slice(2,7);
+const clone = o => JSON.parse(JSON.stringify(o));
+const stable = o => JSON.stringify(o, (k,v)=> v && typeof v==='object' && !Array.isArray(v) ? Object.keys(v).sort().reduce((a,x)=>(a[x]=v[x],a),{}) : v);
+const safeUrl = u => /^https?:\/\//i.test(String(u||'')) ? u : '';
+const todayISO = () => { const d=new Date(); return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+const fmtDate = iso => { if(!iso) return ''; const d=new Date(iso.length===10?iso+'T12:00:00':iso); return isNaN(d)?'':d.toLocaleDateString('en-CA',{month:'short',day:'numeric',year:'numeric'}); };
+const slug = s => (String(s||'post').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48) || 'post');
+const fmtOf = d => (d && d.format==='story') ? 'story' : 'post';
+let toastTimer;
+function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,4200); }
+async function getCap(name){
+  if(name in S.caps) return S.caps[name];
+  let v=null;
+  try{ if(window.claude && typeof window.claude.use==='function') v = await window.claude.use(name); }catch(e){ v=null; }
+  S.caps[name]=v; return v;
+}
+function lsGet(k,f){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):f; }catch(e){ return f; } }
+function lsSet(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } }
+const IN_CLAUDE = !!(window.claude && typeof window.claude.use==='function');
+const IDB = {
+  db:null,
+  open(){ return this.db || (this.db = new Promise((res,rej)=>{ const r=indexedDB.open('content-studio',1); r.onupgradeneeded=()=>r.result.createObjectStore('kv'); r.onsuccess=()=>res(r.result); r.onerror=()=>rej(r.error); })); },
+  async get(k){ try{ const db=await this.open(); return await new Promise((res,rej)=>{ const q=db.transaction('kv').objectStore('kv').get(k); q.onsuccess=()=>res(q.result); q.onerror=()=>rej(q.error); }); }catch(e){ return undefined; } },
+  async set(k,v){ try{ const db=await this.open(); await new Promise((res,rej)=>{ const t=db.transaction('kv','readwrite'); t.objectStore('kv').put(v,k); t.oncomplete=()=>res(); t.onerror=()=>rej(t.error); t.onabort=()=>rej(t.error); }); return true; }catch(e){ return false; } }
+};
+async function saveFile({filename, data}){
+  const dl = await getCap('downloads');
+  if(dl) return dl.save({filename, data});
+  if(IN_CLAUDE){ const err=new Error('unavailable'); err.code='unavailable'; throw err; }
+  const blob = data instanceof Blob ? data : new Blob([data]);
+  const url = URL.createObjectURL(blob); const a=document.createElement('a');
+  a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
+  return {status:'saved'};
+}
+
+/* =========================== storage =========================== */
+const Store = {
+  mode:'loading', db:null, base:null, sent:{}, timers:{},
+  async init(){
+    const [db,user] = await Promise.all([getCap('db'), getCap('user')]);
+    if(db && user){ try{ const id = await user.id(); if(id){ this.db=db; this.base='data/users/'+id; this.mode='db'; } }catch(e){} }
+    if(this.mode==='db') this.subscribe(); else await this.useLocal();
+  },
+  async useLocal(){
+    this.mode='local';
+    const g = async k => { let v=await IDB.get('cs.'+k); if(v===undefined){ const old=lsGet('cs.'+k,undefined); if(old!==undefined){ v=old; IDB.set('cs.'+k,old); } } return v; };
+    S.ideas = (await g('ideas'))||[]; S.carousels = (await g('carousels'))||[]; S.photos = (await g('photos'))||[];
+    S.brand = {...clone(DEFAULT_BRAND), ...((await g('brand'))||{})};
+    S.loaded={ideas:true,carousels:true};
+    try{ if(navigator.storage && navigator.storage.persist) navigator.storage.persist(); }catch(e){}
+    setStatus(IN_CLAUDE?'Saved in this browser only':'Saved on this device. Download a backup now and then.'); applyBrand();
+  },
+  lt:{},
+  saveLocal(k, now=false){
+    clearTimeout(this.lt[k]);
+    const run = async()=>{ delete this.lt[k]; const ok=await IDB.set('cs.'+k, k==='brand'?clone(S.brand):clone(S[k])); if(!ok) toast('Couldn’t save on this device. It may be out of storage space.'); };
+    if(now) return run();
+    this.lt[k]=setTimeout(run,300);
+  },
+  flushLocal(){ Object.keys(this.lt).forEach(k=>this.saveLocal(k,true)); },
+  subscribe(){
+    const timer = setTimeout(()=>{ if(!S.loaded.ideas) setStatus('Still connecting to your saved data…'); },10000);
+    this.db.collection(this.base+'/studio/ideas').onSnapshot(snap=>{
+      clearTimeout(timer);
+      const next = snap.docs.map(d=>({...clone(d.data()||{}), id:d.id}));
+      const changed = stable(next)!==stable(S.ideas);
+      S.ideas = next; S.loaded.ideas=true; setStatus('Saved to your account');
+      if(changed && !isBusyUI()) render(); else updateCounts();
+    }, ()=> setStatus('Couldn’t reach your saved ideas. Changes may not save.'));
+    this.db.collection(this.base+'/studio/carousels').onSnapshot(snap=>{
+      let structural=false;
+      const incoming = snap.docs.map(d=>({...clone(d.data()||{}), id:d.id}));
+      const merged = incoming.map(c=>{
+        const local = S.carousels.find(x=>x.id===c.id);
+        const json = stable(c);
+        if(local && (this.timers['car:'+c.id] || this.sent['car:'+c.id]===json)) return local;
+        if(!local || stable(local)!==json) structural=true;
+        return c;
+      });
+      const pendingNew = S.carousels.filter(c=>!incoming.find(x=>x.id===c.id) && this.timers['car:'+c.id]);
+      if(S.carousels.length!==merged.length+pendingNew.length) structural=true;
+      S.carousels = [...merged, ...pendingNew]; S.loaded.carousels=true;
+      if(structural && !isBusyUI()) render(); else updateCounts();
+    }, ()=> setStatus('Couldn’t reach your saved posts.'));
+    this.db.collection(this.base+'/studio/photos').onSnapshot(snap=>{
+      const next = snap.docs.map(d=>({...clone(d.data()||{}), id:d.id}));
+      const changed = stable(next)!==stable(S.photos);
+      S.photos = next;
+      if(changed && S.view==='photos' && !isBusyUI()) render(); else updateCounts();
+    });
+    this.db.doc(this.base+'/brand').onSnapshot(d=>{
+      if(this.timers.brand) return;
+      const next = {...clone(DEFAULT_BRAND), ...(d.exists ? clone(d.data()||{}) : {})};
+      if(stable(next)!==stable(S.brand)){ S.brand=next; applyBrand(); if(!isBusyUI()) render(); }
+    });
+  },
+  async putIdea(idea){
+    const i = S.ideas.findIndex(x=>x.id===idea.id);
+    if(i>=0) S.ideas[i]=idea; else S.ideas.push(idea);
+    if(this.mode==='db'){ const {id,...rest}=idea; try{ await this.db.doc(this.base+'/studio/ideas/'+id).set(rest); }catch(e){ toast('That change didn’t save. Check your connection.'); } }
+    else this.saveLocal('ideas');
+  },
+  async delIdea(id){
+    S.ideas = S.ideas.filter(x=>x.id!==id);
+    if(this.mode==='db'){ try{ await this.db.doc(this.base+'/studio/ideas/'+id).delete(); }catch(e){ toast('Couldn’t delete that idea.'); } }
+    else this.saveLocal('ideas');
+  },
+  queueCarousel(car, delay=700){
+    car.updatedAt = new Date().toISOString();
+    const key='car:'+car.id;
+    clearTimeout(this.timers[key]);
+    this.timers[key] = setTimeout(()=>this.flushCarousel(car.id),delay);
+    if(this.mode!=='db') this.saveLocal('carousels');
+  },
+  async flushCarousel(id){
+    const key='car:'+id; delete this.timers[key];
+    const car = S.carousels.find(c=>c.id===id); if(!car) return;
+    if(this.mode==='db'){
+      const {id:_,...rest}=car; this.sent[key]=stable(car);
+      try{ await this.db.doc(this.base+'/studio/carousels/'+id).set(rest); }catch(e){ toast('Your design didn’t save. Check your connection.'); }
+    } else this.saveLocal('carousels');
+  },
+  async delCarousel(id){
+    clearTimeout(this.timers['car:'+id]); delete this.timers['car:'+id];
+    S.carousels = S.carousels.filter(c=>c.id!==id);
+    if(this.mode==='db'){ try{ await this.db.doc(this.base+'/studio/carousels/'+id).delete(); }catch(e){ toast('Couldn’t delete that design.'); } }
+    else this.saveLocal('carousels');
+  },
+  async putPhoto(p){
+    S.photos.push(p);
+    if(this.mode==='db'){ const {id,...rest}=p; try{ await this.db.doc(this.base+'/studio/photos/'+id).set(rest); }catch(e){ toast('That photo didn’t save to your library.'); } }
+    else this.saveLocal('photos');
+  },
+  async delPhoto(id){
+    S.photos = S.photos.filter(p=>p.id!==id);
+    if(this.mode==='db'){ try{ await this.db.doc(this.base+'/studio/photos/'+id).delete(); }catch(e){ toast('Couldn’t delete that photo.'); } }
+    else this.saveLocal('photos');
+  },
+  async updatePhoto(p){
+    const i=S.photos.findIndex(x=>x.id===p.id); if(i>=0) S.photos[i]=p;
+    if(this.mode==='db'){ const {id,...rest}=p; try{ await this.db.doc(this.base+'/studio/photos/'+id).set(rest); }catch(e){ toast('That change didn’t save.'); } }
+    else this.saveLocal('photos');
+  },
+  queueBrand(){
+    clearTimeout(this.timers.brand);
+    this.timers.brand = setTimeout(async()=>{
+      delete this.timers.brand;
+      if(this.mode==='db'){ try{ await this.db.doc(this.base+'/brand').set(clone(S.brand)); }catch(e){ toast('Brand settings didn’t save.'); } }
+      else this.saveLocal('brand',true);
+    },600);
+  }
+};
+function setStatus(t){ $('#store-status').textContent=t; }
+function isTyping(){ const a=document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && $('#main').contains(a); }
+function isBusyUI(){ return isTyping() || !!drag || $('#dlg').open; }
+
+/* =========================== brand =========================== */
+const loadedFontLinks = new Set(['Playfair Display','Jost']);
+function loadGoogleFont(family){
+  family=(family||'').trim(); if(!family || loadedFontLinks.has(family)) return;
+  if((S.brand.fontFiles||[]).some(f=>f.family===family)) return;
+  loadedFontLinks.add(family);
+  const fam = encodeURIComponent(family).replace(/%20/g,'+');
+  const link = document.createElement('link'); link.rel='stylesheet';
+  link.href = `https://fonts.googleapis.com/css2?family=${fam}:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap`;
+  link.onerror = ()=>{ link.href=`https://fonts.googleapis.com/css2?family=${fam}&display=swap`; link.onerror=null; };
+  document.head.appendChild(link);
+}
+let fontFaceEl;
+function applyBrand(){
+  const b=S.brand;
+  [b.displayFont,b.bodyFont,b.scriptFont].forEach(loadGoogleFont);
+  if(!fontFaceEl){ fontFaceEl=document.createElement('style'); document.head.appendChild(fontFaceEl); }
+  fontFaceEl.textContent = (b.fontFiles||[]).map(f=>`@font-face{font-family:"${f.family.replace(/["\\]/g,'')}";src:url("${f.data||('/_blob/'+f.assetId)}");font-display:swap;}`).join('\n');
+  $('#bm-name').textContent = b.name || 'Content Studio';
+}
+function fam(name, fallback){ return name ? `'${name.replace(/['"]/g,'')}', ${fallback}` : fallback; }
+function brandVars(){
+  const b=S.brand, display=fam(b.displayFont,'Georgia, serif');
+  return `--b-bg:${b.bg};--b-card:${b.card};--b-accent:${b.accent};--b-ink:${b.ink};--b-soft:${b.soft};`+
+         `--b-display:${display};--b-body:${fam(b.bodyFont,'system-ui, sans-serif')};--b-script:${b.scriptFont?fam(b.scriptFont,'cursive'):display};`;
+}
+function imgSrc(id,data){ return data ? data : (id ? '/_blob/'+id : ''); }
+
+/* =========================== slide rendering =========================== */
+function hSize(text, base){
+  const n=(text||'').length;
+  const k = n<=16?1 : n<=28?.88 : n<=44?.76 : n<=64?.64 : n<=90?.54 : .46;
+  return Math.round(base*k);
+}
+function slideHTML(s, i, n, fmt='post', opts={}){
+  const b=S.brand, bg=s.bg||'sand', photo=bg==='photo';
+  const scale = photo ? .82 : 1;
+  const scriptCls = b.scriptFont ? ' script' : '';
+  const pos = s.pos||{}, al = s.align||{};
+  const E = (key, tag, cls, inner, style='') => {
+    const p=pos[key], a=al[key];
+    const st = (p?`transform:translate(${p.x||0}px,${p.y||0}px);`:'') + style;
+    return `<${tag} class="${cls}${a?' al-'+a:''}${opts.sel===key?' is-sel':''}" data-el="${key}"${st?` style="${st}"`:''}>${inner}</${tag}>`;
+  };
+  const H = (t,base)=> t ? E('heading','h2','h',br(t),`font-size:${hSize(t,base*scale)}px;`) : '';
+  const A = (t,size)=> t ? E('accent','p','acc'+scriptCls,br(t),`font-size:${Math.round(size*scale)}px;`) : '';
+  const B = t => t ? E('body','p','body',br(t),`font-size:${Math.round(38*(photo?.9:1))}px;`) : '';
+  const P = t => t ? E('button','div','pill',esc(t)) : '';
+  const items = (s.items||[]).filter(x=>x && x.trim());
+  let inner='';
+  switch(s.layout){
+    case 'cover': inner = H(s.heading,120) + A(s.accent,58) + B(s.body) + P(s.button); break;
+    case 'statement': inner = H(s.heading,124) + A(s.accent,56) + (s.body?E('rule','div','rule',''):'') + B(s.body) + P(s.button); break;
+    case 'list': {
+      const fs = Math.round((items.length>5?30:items.length>3?33:36)*scale);
+      inner = H(s.heading,92) + A(s.accent,48) + (items.length?E('items','div','items',items.map(t=>`<div class="item" style="font-size:${fs}px">${esc(t)}</div>`).join('')):'') + B(s.body) + P(s.button);
+      break; }
+    case 'steps': {
+      const fs = Math.round((items.length>4?30:34)*scale);
+      inner = H(s.heading,88) + A(s.accent,48) + (items.length?E('items','ol','steps',items.map((t,k)=>`<li style="font-size:${fs}px"><span class="n">${k+1}</span><span>${esc(t)}</span></li>`).join(''),`gap:${items.length>4?22:30}px;`):'') + B(s.body) + P(s.button);
+      break; }
+    case 'stat': {
+      const num = s.number||'';
+      const size = Math.round((num.length<=4?300:num.length<=7?240:num.length<=10?180:130)*scale);
+      inner = (num?E('number','p','big',esc(num),`font-size:${size}px;`):'') + H(s.heading,72) + A(s.accent,46) + B(s.body) + P(s.button);
+      break; }
+    case 'mythfact':
+      inner = H(s.heading,80) + `<div class="mf">${E('myth','div','card myth',`<span class="lbl${scriptCls}">Myth</span><span class="txt">${br(s.myth||'')}</span>`)}${E('fact','div','card fact',`<span class="lbl${scriptCls}">Fact</span><span class="txt">${br(s.fact||'')}</span>`)}</div>` + B(s.body);
+      break;
+    case 'cta': {
+      const hs = imgSrc(b.headshotId,b.headshotData);
+      inner = E('headshot','div','headshot','',hs?`background-image:url('${hs}');`:'') + H(s.heading,84) + A(s.accent,48) + B(s.body) + P(s.button) +
+        ((b.name||b.extra)?E('sig','div','sig',`${b.name?`<b>${esc(b.name)}</b>`:''}${b.extra?`<span>${esc(b.extra)}</span>`:''}`):'');
+      break; }
+    default: inner = H(s.heading,110) + B(s.body);
+  }
+  const footBits = `${s.footnote?`<span class="fn">${br(s.footnote)}</span>`:''}${b.handle?`<span>${esc(b.handle)}</span>`:''}`;
+  const footIn = photo && footBits ? E('foot','div','foot-in',footBits) : '';
+  const footOut = !photo && footBits ? E('foot','div','foot',footBits) : '';
+  const src = photo ? imgSrc(s.photoId,s.photoData) : '';
+  const ph = photo ? `<div class="ph" style="${src?`background-image:url('${src}')`:''}"></div><div class="ph-veil"></div>` : '';
+  return `<div class="slide fmt-${fmt} bg-${bg} lay-${s.layout}">${ph}<div class="panel">${inner}${footIn}</div>${footOut}</div>`;
+}
+function frameHTML(s,i,n,fmt='post',opts={}){ return `<div class="frame fmt-${fmt}${opts.live?' live':''}"><div class="brand-scope" style="${esc(brandVars())}">${slideHTML(s,i,n,fmt,opts)}</div></div>`; }
+const ro = new ResizeObserver(entries=>{ for(const e of entries){ e.target.style.setProperty('--s', (e.contentRect.width/1080).toFixed(4)); } });
+function fitFrames(root=document){ root.querySelectorAll('.frame').forEach(f=>{ f.style.setProperty('--s',(f.clientWidth/1080).toFixed(4)); ro.observe(f); }); }
+
+/* =========================== nav / render =========================== */
+function usageMap(){
+  const m={};
+  S.carousels.forEach(c=>{ const seen=new Set(); (c.slides||[]).forEach(s=>{ const k=s.bg==='photo'?(s.photoId||s.photoData):''; if(k && !seen.has(k)){ seen.add(k); m[k]=(m[k]||0)+1; } }); });
+  return m;
+}
+function libraryPhotos(){
+  const use=usageMap();
+  const lib = S.photos.map(p=>({...p, src:imgSrc(p.assetId,p.data), used:use[p.assetId||p.data]||0}));
+  const known = new Set(lib.map(p=>p.assetId||p.data));
+  const refs=[];
+  S.carousels.forEach(c=>(c.slides||[]).forEach(s=>{ const k=s.photoId||s.photoData; if(k && !known.has(k)){ known.add(k); refs.push({id:'ref-'+refs.length, assetId:s.photoId||'', data:s.photoData||'', ref:true, category:'', used:use[k]||0, src:imgSrc(s.photoId,s.photoData)}); } }));
+  return [...lib.sort((a,b)=>(a.order||0)-(b.order||0) || (b.createdAt||'').localeCompare(a.createdAt||'')), ...refs];
+}
+const usedLabel = n => n ? `Used in ${n} ${n>1?'posts':'post'}` : '';
+function updateCounts(){
+  $('#n-car').textContent = S.carousels.filter(c=>c.kind!=='single').length || '';
+  $('#n-single').textContent = S.carousels.filter(c=>c.kind==='single').length || '';
+  $('#n-photos').textContent = libraryPhotos().length || '';
+  $('#n-ideas').textContent = S.ideas.filter(i=>i.status!=='used').length || '';
+  $('#n-used').textContent = S.ideas.filter(i=>i.status==='used').length || '';
+  const car=curCar(); const navView = S.view==='editor' ? (car&&car.kind==='single'?'singles':'carousels') : S.view;
+  document.querySelectorAll('[data-nav]').forEach(b=>{ if(b.closest('.nav')) b.setAttribute('aria-current', b.dataset.nav===navView?'page':'false'); });
+}
+function go(view){ S.view=view; if(view!=='editor'){ S.editing=null; S.sel=null; } render(); $('#main').focus({preventScroll:true}); window.scrollTo(0,0); }
+function render(){
+  updateCounts();
+  const m=$('#main');
+  if(S.mode==='loading' || (!S.loaded.ideas && Store.mode==='db')){ m.innerHTML=`<div class="empty"><span class="spinner"></span> Loading your studio…</div>`; return; }
+  ({carousels:()=>viewDesigns('carousel'), singles:()=>viewDesigns('single'), editor:viewEditor, photos:viewPhotos, ideas:viewIdeas, used:viewUsed, brand:viewBrand})[S.view]();
+  fitFrames(m);
+}
+
+/* ---------- design lists ---------- */
+function viewDesigns(kind){
+  const single = kind==='single';
+  const list=S.carousels.filter(c=> single ? c.kind==='single' : c.kind!=='single').sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
+  $('#main').innerHTML = `
+  <div class="view-head"><div><h1>${single?'Single posts':'Carousels'}</h1><p>${single?'One-image posts in your brand style. Switch any of them to story size in the editor.':'Swipeable posts in your brand style. Download them as images, or as an editable file for Canva.'}</p></div>
+  <div class="row"><button class="btn primary" data-act="${single?'new-single':'new-car'}">${single?'New single post':'New carousel'}</button></div></div>
+  ${list.length? `<div class="car-grid">${list.map(c=>{
+    const first=c.slides&&c.slides[0], fmt=fmtOf(c);
+    return `<div class="car-card"><button class="open" data-open="${esc(c.id)}">${first?frameHTML(first,0,c.slides.length,fmt):'<div class="frame"></div>'}
+      <div class="meta"><div class="t">${esc(c.title||'Untitled')}</div><div class="m">${fmt==='story'?'<span class="badge">Story</span>':''}${single?'':`${(c.slides||[]).length} slides,`} edited ${fmtDate(c.updatedAt)}</div></div></button>
+      <div class="acts"><button class="btn small ghost" data-story-copy="${esc(c.id)}">${fmt==='story'?'Post copy':'Story copy'}</button><button class="btn small ghost" data-dup="${esc(c.id)}">Duplicate</button></div></div>`;}).join('')}</div>`
+  : `<div class="empty"><h2>${single?'No single posts yet':'No carousels yet'}</h2><p>${single?'Start one here, or pick a photo from your library and make a post from it.':'Start a blank one, or pick a researched idea and turn it into slides.'}</p><div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-act="${single?'new-single':'new-car'}">${single?'New single post':'New carousel'}</button><button class="btn" data-nav="${single?'photos':'ideas'}">${single?'Open photos':'See ideas'}</button></div></div>`}`;
+}
+function blankSlides(){
+  return [
+    {id:uid('s'),layout:'cover',bg:'photo',heading:'Your headline here',accent:'a short supporting line',body:'',button:'Swipe for more',items:[]},
+    {id:uid('s'),layout:'list',bg:'sand',heading:'Three things to know',items:['First point','Second point','Third point'],body:''},
+    {id:uid('s'),layout:'cta',bg:'white',heading:'Questions? Let’s talk.',body:'Send me a message any time.',button:'Send me a DM',items:[]}
+  ];
+}
+function newDesign({kind='carousel', idea=null, slides=null, format='post', title=''}={}){
+  const d={id:uid('c'), kind, format, title: title || (idea?idea.title:(kind==='single'?'Untitled post':'Untitled carousel')),
+    ideaId:idea?idea.id:'', factsText:idea?ideaFactsText(idea):'',
+    slides: slides || (kind==='single' ? [{id:uid('s'),layout:'cover',bg:'photo',heading:'Your headline here',accent:'a short supporting line',items:[]}] : blankSlides()),
+    createdAt:new Date().toISOString()};
+  S.carousels.push(d); Store.queueCarousel(d,0);
+  if(idea && idea.status!=='used' && idea.status!=='designed') Store.putIdea({...idea,status:'designed'});
+  openEditor(d.id); return d;
+}
+function copyDesign(id, format){
+  const src=S.carousels.find(c=>c.id===id); if(!src) return;
+  const fmt = format || fmtOf(src);
+  const d={...clone(src), id:uid('c'), format:fmt, title: src.title + (format? (fmt==='story'?' (story)':' (post)') : ' (copy)'), createdAt:new Date().toISOString()};
+  d.slides.forEach(s=>s.id=uid('s'));
+  S.carousels.push(d); Store.queueCarousel(d,0); openEditor(d.id);
+  toast(format ? (fmt==='story'?'Story copy made. Check the spacing and nudge anything that needs it.':'Post copy made.') : 'Duplicate made');
+}
+function openEditor(id){ S.editing=id; S.slideIdx=0; S.sel=null; S.view='editor'; render(); window.scrollTo(0,0); }
+
+/* ---------- editor ---------- */
+function curCar(){ return S.carousels.find(c=>c.id===S.editing); }
+function curSlide(){ const c=curCar(); return c ? c.slides[S.slideIdx] : null; }
+function viewEditor(){
+  const car=curCar(); if(!car){ S.view='carousels'; return viewDesigns('carousel'); }
+  if(S.slideIdx>=car.slides.length) S.slideIdx=Math.max(0,car.slides.length-1);
+  const single = car.kind==='single', fmt=fmtOf(car);
+  const n=car.slides.length, s=car.slides[S.slideIdx];
+  const idea = car.ideaId ? S.ideas.find(i=>i.id===car.ideaId) : null;
+  $('#main').innerHTML = `
+  <div class="ed-top">
+    <div class="r1">
+      <button class="btn ghost" data-nav="${single?'singles':'carousels'}">${single?'All single posts':'All carousels'}</button>
+      <label class="sr" for="car-title">Title</label>
+      <input id="car-title" class="title-input" value="${esc(car.title)}" data-car-title>
+    </div>
+    <div class="r2">
+      <div class="seg" role="group" aria-label="Size">${Object.entries(DIM).map(([k,v])=>`<button data-fmt="${k}" aria-pressed="${k===fmt}">${v.label}</button>`).join('')}</div>
+      ${single?'':`<div class="stepper" role="group" aria-label="Number of slides"><span>Slides</span><button data-act="count-minus" aria-label="Remove the last slide">−</button><input type="number" min="1" max="20" value="${n}" data-count aria-label="Number of slides"><button data-act="count-plus" aria-label="Add a slide">+</button></div>`}
+      <span class="spacer"></span>
+      <button class="btn" data-story-copy="${esc(car.id)}">${fmt==='story'?'Make a post copy':'Make a story copy'}</button>
+      ${single?'<button class="btn" data-act="to-carousel">Turn into carousel</button>':''}
+      <button class="btn primary" data-act="download">Download</button>
+      <button class="btn ghost danger" data-act="del-car">Delete</button>
+    </div>
+  </div>
+  ${idea?`<p style="margin:-6px 0 16px;color:var(--muted);font-size:14px">Built from the idea “${esc(idea.title)}”</p>`:''}
+  <div class="ed-body${single?' single':''}">
+    ${single?'':`<div class="thumbs" role="list" aria-label="Slides">
+      ${car.slides.map((sl,k)=>`<button class="thumb${fmt==='story'?' story':''}" role="listitem" data-slide="${k}" aria-current="${k===S.slideIdx}" aria-label="Slide ${k+1}"><span class="num">${k+1}</span>${frameHTML(sl,k,n,fmt)}</button>`).join('')}
+      <button class="add-slide" data-act="add-slide">Add slide</button>
+    </div>`}
+    <div class="stage">
+      ${s?`<div class="tools" id="tools">${toolsInner()}</div>
+      <div id="stage-frame" class="fmt-${fmt}">${frameHTML(s,S.slideIdx,n,fmt,{live:true,sel:S.sel})}</div>
+      ${single?'':`<div class="stage-nav"><button class="btn small ghost" data-act="prev" ${S.slideIdx===0?'disabled':''}>Previous</button><span>Slide ${S.slideIdx+1} of ${n}</span><button class="btn small ghost" data-act="next" ${S.slideIdx>=n-1?'disabled':''}>Next</button></div>`}
+      <div id="warn-box"></div>`:`<div class="empty">This design has no slides. Add one to start.</div>`}
+    </div>
+    ${s?fieldsHTML(s,car):'<div></div>'}
+  </div>`;
+  renderWarnings();
+}
+function toolsInner(){
+  const label = S.sel ? `Selected: <b>${ELNAME[S.sel]||S.sel}</b>. Drag it on the slide to move it. Alignment applies to it only.` : 'Tap anything on the slide to select it, then drag to move it. With nothing selected, alignment applies to the whole slide.';
+  return `<span class="tl">${label}</span>
+    <div class="tgroup" role="group" aria-label="Alignment">
+      <button data-align="left" aria-label="Align left">${ICON.left}<span>Left</span></button>
+      <button data-align="center" aria-label="Align center">${ICON.center}<span>Center</span></button>
+      <button data-align="right" aria-label="Align right">${ICON.right}<span>Right</span></button>
+    </div>
+    <button class="btn small" data-act="center-all">Center all</button>
+    <button class="btn small ghost" data-act="reset-layout">Reset layout</button>
+    ${S.sel?'<button class="btn small ghost" data-act="deselect">Deselect</button>':''}`;
+}
+function refreshTools(){ const t=$('#tools'); if(t) t.innerHTML=toolsInner(); }
+function markSel(){
+  const st=$('#stage-frame'); if(!st) return;
+  st.querySelectorAll('.is-sel').forEach(e=>e.classList.remove('is-sel'));
+  if(S.sel){ const e=st.querySelector(`[data-el="${S.sel}"]`); if(e) e.classList.add('is-sel'); else S.sel=null; }
+  refreshTools();
+}
+function fieldsHTML(s,car){
+  const L=s.layout, f=(k,label,rows=2,hint='')=>`<div class="field"><label for="f-${k}">${label}</label><textarea id="f-${k}" rows="${rows}" data-field="${k}">${esc(k==='items'?(s.items||[]).join('\n'):(s[k]||''))}</textarea>${hint?`<span class="hint">${hint}</span>`:''}</div>`;
+  const i=(k,label,hint='')=>`<div class="field"><label for="f-${k}">${label}</label><input type="text" id="f-${k}" data-field="${k}" value="${esc(s[k]||'')}">${hint?`<span class="hint">${hint}</span>`:''}</div>`;
+  const b=S.brand, swatch={photo:'linear-gradient(135deg,'+b.soft+','+b.accent+')',sand:b.bg,white:b.card,taupe:b.accent,ink:b.ink};
+  const parts=[];
+  if(L!=='stat') parts.push(f('heading','Headline',2));
+  if(L==='stat'){ parts.push(i('number','Big number','Keep it short, like $8,000 or 30 years')); parts.push(f('heading','Line under the number',2)); }
+  if(['cover','statement','list','steps','stat','cta'].includes(L)) parts.push(i('accent','Italic line','Optional. Shows in your accent font.'));
+  if(L==='list'||L==='steps') parts.push(f('items', L==='steps'?'Steps, one per line':'List items, one per line',5, L==='steps'?'Use steps only when the order matters.':''));
+  if(L==='mythfact'){ parts.push(f('myth','Myth',2)); parts.push(f('fact','Fact',3)); }
+  parts.push(f('body','Body text',3));
+  if(L!=='mythfact') parts.push(i('button','Button text','Optional, like “Swipe for more” or “DM me HOME”'));
+  parts.push(i('footnote','Small print','Optional, like “Confirm details with your lawyer.”'));
+  const src=imgSrc(s.photoId,s.photoData);
+  const single=car.kind==='single';
+  return `<div class="fields">
+    <div class="field"><span class="lbl">Layout</span><div class="seg" role="group" aria-label="Layout">${Object.entries(LAYOUTS).map(([k,v])=>`<button data-layout="${k}" aria-pressed="${k===L}">${v}</button>`).join('')}</div></div>
+    <div class="field"><span class="lbl">Background</span><div class="seg" role="group" aria-label="Background">${Object.entries(BGS).map(([k,v])=>`<button data-bg="${k}" aria-pressed="${k===(s.bg||'sand')}"><span class="sw" style="background:${swatch[k]}"></span>${v}</button>`).join('')}</div></div>
+    ${s.bg==='photo'?`<div class="field"><span class="lbl">Photo</span><div class="row"><button class="btn small" data-act="pick-photo">${src?'Change photo':'Choose photo'}</button>${src?'<button class="btn small ghost" data-act="rm-photo">Remove</button>':''}</div><span class="hint">Pick from your photos or upload a new one. Bright interiors work best behind the card.</span></div>`:''}
+    ${parts.join('')}
+    ${single?'':`<div class="slide-tools">
+      <button class="btn small" data-act="dup-slide">Duplicate slide</button>
+      <button class="btn small" data-act="up-slide" ${S.slideIdx===0?'disabled':''}>Move earlier</button>
+      <button class="btn small" data-act="down-slide" ${S.slideIdx>=car.slides.length-1?'disabled':''}>Move later</button>
+      <button class="btn small ghost danger" data-act="del-slide">Delete slide</button>
+    </div>`}
+  </div>`;
+}
+function refreshPreview(){
+  const car=curCar(); if(!car) return; const s=car.slides[S.slideIdx], n=car.slides.length, fmt=fmtOf(car);
+  const st=$('#stage-frame .brand-scope'); if(st) st.innerHTML=slideHTML(s,S.slideIdx,n,fmt,{sel:S.sel});
+  const th=document.querySelector(`.thumb[data-slide="${S.slideIdx}"] .brand-scope`); if(th) th.innerHTML=slideHTML(s,S.slideIdx,n,fmt);
+  renderWarnings();
+}
+const numRe=/\$?\d[\d,]*(?:\.\d+)?\s*%?/g;
+const normNum = t => t.replace(/[\s$,%]/g,'').replace(/\.0+$/,'');
+function renderWarnings(){
+  const box=$('#warn-box'); if(!box) return; const car=curCar(); if(!car||!car.factsText){ box.innerHTML=''; return; }
+  const facts = new Set((car.factsText.match(numRe)||[]).map(normNum));
+  const ok = new Set(['1','2','3','4','5','6','7','8','9','10']);
+  const bad=new Set();
+  car.slides.forEach(s=>{ const txt=[s.heading,s.accent,s.body,s.number,s.myth,s.fact,s.button,s.footnote,...(s.items||[])].join(' ');
+    (txt.match(numRe)||[]).forEach(m=>{ const k=normNum(m); if(k && !facts.has(k) && !ok.has(k)) bad.add(m.trim()); }); });
+  box.innerHTML = bad.size ? `<div class="warn">These numbers aren’t in your research notes for this idea: <b>${[...bad].map(esc).join(', ')}</b>. Double-check them before posting.</div>` : '';
+}
+function presentKeys(){ const st=$('#stage-frame'); return st ? [...new Set([...st.querySelectorAll('[data-el]')].map(e=>e.dataset.el))] : []; }
+function setAlign(v){
+  const car=curCar(), s=curSlide(); if(!s) return;
+  s.align=s.align||{}; s.pos=s.pos||{};
+  const keys = S.sel ? [S.sel] : presentKeys();
+  keys.forEach(k=>{ if(v==='center') delete s.align[k]; else s.align[k]=v; if(s.pos[k]){ s.pos[k].x=0; if(!s.pos[k].y) delete s.pos[k]; } });
+  Store.queueCarousel(car); refreshPreview();
+}
+function centerAll(){
+  const car=curCar(), s=curSlide(); if(!s) return;
+  s.align={}; const p=s.pos||{}; Object.keys(p).forEach(k=>{ p[k].x=0; if(!p[k].y) delete p[k]; }); s.pos=p;
+  Store.queueCarousel(car); refreshPreview(); toast('Everything on this slide is centered');
+}
+function setCount(target){
+  const car=curCar(); if(!car) return; target=Math.max(1,Math.min(20,Math.round(target)||1));
+  const n=car.slides.length; if(target===n){ render(); return; }
+  if(target>n){ for(let k=n;k<target;k++) car.slides.push({id:uid('s'),layout:'statement',bg:k%2?'white':'sand',heading:'New slide',body:'',items:[]}); }
+  else { if(!confirm(`Remove the last ${n-target} slide${n-target>1?'s':''}?`)){ render(); return; } car.slides.splice(target); if(S.slideIdx>=target) S.slideIdx=target-1; }
+  Store.queueCarousel(car); render();
+}
+
+/* ---------- drag to move ---------- */
+let drag=null;
+document.addEventListener('pointerdown', e=>{
+  const st=e.target.closest('#stage-frame'); if(!st) return;
+  const el=e.target.closest('[data-el]');
+  if(!el){ if(S.sel){ S.sel=null; markSel(); } return; }
+  e.preventDefault();
+  const key=el.dataset.el; if(S.sel!==key){ S.sel=key; markSel(); }
+  const s=curSlide(); const p=(s.pos&&s.pos[key])||{x:0,y:0};
+  const scale=parseFloat($('#stage-frame .frame').style.getPropertyValue('--s'))||0.4;
+  drag={el,key,sx:e.clientX,sy:e.clientY,ox:p.x||0,oy:p.y||0,nx:p.x||0,ny:p.y||0,scale,moved:false,id:e.pointerId};
+  try{ el.setPointerCapture(e.pointerId); }catch(err){}
+});
+document.addEventListener('pointermove', e=>{
+  if(!drag || e.pointerId!==drag.id) return;
+  const dx=(e.clientX-drag.sx)/drag.scale, dy=(e.clientY-drag.sy)/drag.scale;
+  if(!drag.moved && Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)<4) return;
+  drag.moved=true;
+  let nx=Math.round(drag.ox+dx), ny=Math.round(drag.oy+dy);
+  if(Math.abs(nx)<14) nx=0; if(Math.abs(ny)<14) ny=0;
+  drag.nx=nx; drag.ny=ny; drag.el.style.transform=`translate(${nx}px,${ny}px)`;
+});
+function endDrag(e){
+  if(!drag || (e && e.pointerId!==drag.id)) return;
+  const d=drag; drag=null;
+  if(d.moved){
+    const car=curCar(), s=curSlide(); if(!s) return;
+    s.pos=s.pos||{}; if(d.nx||d.ny) s.pos[d.key]={x:d.nx,y:d.ny}; else delete s.pos[d.key];
+    Store.queueCarousel(car);
+    const th=document.querySelector(`.thumb[data-slide="${S.slideIdx}"] .brand-scope`); if(th) th.innerHTML=slideHTML(s,S.slideIdx,car.slides.length,fmtOf(car));
+  }
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', endDrag);
+
+/* ---------- photos ---------- */
+function viewPhotos(){
+  const all=libraryPhotos();
+  const unsorted=all.filter(p=>!PHOTO_CATS[p.category]);
+  if(S.photoCat==='unsorted' && !unsorted.length) S.photoCat='interior';
+  const tabs=[...Object.entries(PHOTO_CATS), ...(unsorted.length?[['unsorted','Not sorted']]:[])];
+  const inCat = k => k==='unsorted' ? unsorted : all.filter(p=>p.category===k);
+  const list=inCat(S.photoCat), usedN=list.filter(p=>p.used).length;
+  const catName = PHOTO_CATS[S.photoCat] || 'Interior';
+  const moveSel = p => `<label class="sr" for="mv-${esc(p.id)}">Section for this photo</label><select id="mv-${esc(p.id)}" class="ph-move" data-move-photo="${esc(p.id)}">${S.photoCat==='unsorted'?'<option value="" selected>Move to…</option>':''}${Object.entries(PHOTO_CATS).map(([k,v])=>`<option value="${k}" ${p.category===k?'selected':''}>${v}</option>`).join('')}</select>`;
+  $('#main').innerHTML = `
+  <div class="view-head"><div><h1>Photos</h1><p>Sorted into interior, nature and abstract. Photos already in a post are marked, so fresh ones are easy to spot.</p></div>
+  <div class="row"><label class="btn primary" for="ph-up">Upload to ${esc(catName)}</label><input id="ph-up" type="file" accept="image/*" multiple class="sr" data-photo-upload></div></div>
+  <div class="chips" role="group" aria-label="Photo sections">${tabs.map(([k,v])=>`<button data-photo-cat="${k}" aria-pressed="${S.photoCat===k}">${v} ${inCat(k).length}</button>`).join('')}</div>
+  ${list.length?`<p class="ph-sub">${list.length} ${list.length>1?'photos':'photo'}${usedN?`, ${usedN} already used`:', none used yet'}</p><div class="ph-grid">${list.map(p=>`<div class="ph-tile${p.used?' is-used':''}">${p.used?`<span class="ph-used">${usedLabel(p.used)}</span>`:''}<div class="ph-img" style="background-image:url('${esc(p.src)}')" role="img" aria-label="${esc(p.name||'Photo')}"></div>
+    <div class="ph-acts"><button class="btn small" data-new-from-photo="${esc(p.id)}">New post</button>${p.ref?'':moveSel(p)}${p.ref?'':`<button class="btn small ghost danger" data-del-photo="${esc(p.id)}">Delete</button>`}</div></div>`).join('')}</div>`
+  : `<div class="empty"><h2>No ${esc(catName.toLowerCase())} photos yet</h2><p>Upload some here and they’ll be ready whenever you build a post.</p><div class="row" style="justify-content:center;margin-top:12px"><label class="btn primary" for="ph-up2">Upload to ${esc(catName)}</label><input id="ph-up2" type="file" accept="image/*" multiple class="sr" data-photo-upload></div></div>`}`;
+}
+async function uploadPhotos(files, category){
+  category = PHOTO_CATS[category] ? category : 'interior';
+  const out=[]; if(!files.length) return out;
+  toast(files.length>1?`Adding ${files.length} photos…`:'Adding your photo…');
+  for(const f of files){
+    try{ const r=await storeImage(f); const p={id:uid('p'),assetId:r.id,data:r.data,name:f.name.replace(/\.[^.]+$/,''),category,createdAt:new Date().toISOString()}; await Store.putPhoto(p); out.push(p); }
+    catch(e){ toast(`${f.name} couldn’t be read. Try a JPG or PNG.`); }
+  }
+  if(out.length) toast(`${out.length>1?out.length+' photos':'Photo'} added to ${PHOTO_CATS[category]}`);
+  return out;
+}
+function photoPicker(){
+  const all=libraryPhotos();
+  const list = S.pickCat==='all' ? all : all.filter(p=>p.category===S.pickCat);
+  showDialog(`<h2>Choose a photo</h2>
+    <div class="chips" role="group" aria-label="Photo sections" style="margin-bottom:6px">${[['all','All'],...Object.entries(PHOTO_CATS)].map(([k,v])=>`<button data-pick-cat="${k}" aria-pressed="${S.pickCat===k}">${v}</button>`).join('')}</div>
+    ${list.length?`<div class="picker">${list.map((p,k)=>`<button data-pick="${k}" style="background-image:url('${esc(p.src)}')" aria-label="Use ${esc(p.name||'this photo')}${p.used?', '+usedLabel(p.used):''}">${p.used?'<span class="pk-used">Used</span>':''}</button>`).join('')}</div>`:'<p style="color:var(--muted)">No photos in this section yet.</p>'}
+    <div class="row end"><label class="btn" for="pick-up">Upload new</label><input id="pick-up" type="file" accept="image/*" multiple class="sr" data-pick-upload><button class="btn ghost" data-close>Cancel</button></div>`);
+  S.pickList=list;
+}
+function applyPhoto(p){
+  const car=curCar(), s=curSlide(); if(!s||!p) return;
+  s.bg='photo'; s.photoId=p.assetId||''; s.photoData=p.assetId?'':(p.data||'');
+  Store.queueCarousel(car,0); closeDialog(); render();
+}
+
+/* ---------- ideas ---------- */
+function ideaFactsText(i){ return [i.title,i.hook,...(i.facts||[])].join(' '); }
+function viewIdeas(){
+  const all=S.ideas.filter(i=>i.status!=='used').sort((a,b)=>(a.order||0)-(b.order||0));
+  const shown = S.ideaFilter==='all'?all:all.filter(i=>i.status===S.ideaFilter);
+  const counts = k=> all.filter(i=>i.status===k).length;
+  $('#main').innerHTML = `
+  <div class="view-head"><div><h1>Idea research</h1><p>Your fact-checked topics, ready to script or design. Anything marked “Needs fact-check” hasn’t been verified yet.</p></div>
+  <div class="row"><button class="btn" data-act="add-idea">Add idea</button></div></div>
+  ${IN_CLAUDE?`<div class="panel-box">
+    <h2>Brainstorm new angles</h2>
+    <p>Get fresh post ideas on a theme. These come back unverified on purpose, so bring them to Claude in chat to fact-check before posting.</p>
+    <div class="row"><label class="sr" for="bs-theme">Theme</label><input id="bs-theme" class="pill-input" type="text" data-bs value="${esc(S.bsTheme)}" placeholder="e.g. condo fees, closing costs, newcomers buying in Toronto">
+    <button class="btn primary" data-act="brainstorm" ${S.busy.bs?'disabled':''}>${S.busy.bs?'<span class="spinner"></span> Thinking…':'Brainstorm'}</button></div>
+    ${S.suggestions.length?`<div class="suggest">${S.suggestions.map((g,k)=>`<div class="s"><b>${esc(g.title)}</b><span style="font-style:italic;color:var(--muted)">${esc(g.hook)}</span>${g.angle?`<span>${esc(g.angle)}</span>`:''}${(g.toVerify||[]).length?`<span style="font-size:13px;color:var(--muted)">To verify: ${esc(g.toVerify.join('; '))}</span>`:''}<div class="row"><button class="btn small" data-save-sug="${k}">Save to research</button></div></div>`).join('')}</div>`:''}
+  </div>`:''}
+  <div class="chips" role="group" aria-label="Filter ideas">
+    ${[['all','All',all.length],...Object.entries(STATUS).map(([k,v])=>[k,v,counts(k)])].map(([k,v,c])=>`<button data-filter="${k}" aria-pressed="${S.ideaFilter===k}">${v} ${c}</button>`).join('')}
+  </div>
+  ${shown.length?`<div class="idea-list">${shown.map(ideaCard).join('')}</div>`:`<div class="empty"><h2>Nothing here yet</h2><p>Add an idea, or brainstorm a few above.</p></div>`}`;
+}
+function ideaCard(i){
+  const facts=i.facts||[], src=i.sources||[];
+  return `<article class="idea">
+    <div class="badges"><span class="badge ${i.status==='unverified'?'warn-b':'ok'}">${STATUS[i.status]||'Researched'}</span>${i.timely?`<span class="badge">${esc(i.timely)}</span>`:''}${i.verifiedOn&&i.status!=='unverified'?`<span class="badge">Checked ${fmtDate(i.verifiedOn)}</span>`:''}</div>
+    <h2>${esc(i.title)}</h2>
+    ${i.hook?`<p class="hook">“${esc(i.hook)}”</p>`:''}
+    ${facts.length?`<ul>${facts.slice(0,3).map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}
+    ${facts.length>3||src.length||i.notes?`<details class="more"><summary>${facts.length>3?`${facts.length-3} more facts, `:''}sources and notes</summary>
+      ${facts.length>3?`<ul style="margin-top:8px">${facts.slice(3).map(f=>`<li>${esc(f)}</li>`).join('')}</ul>`:''}
+      ${i.notes?`<p style="font-size:14px;margin:10px 0 0">${br(i.notes)}</p>`:''}
+      ${src.length?`<div class="sources" style="margin-top:10px">${src.map(s=>safeUrl(s.url)?`<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(s.label||s.url)}</a>`:`<span>${esc(s.label)}</span>`).join('')}</div>`:''}
+    </details>`:''}
+    <div class="actions">
+      <button class="btn small primary" data-make-car="${esc(i.id)}" ${S.busy['mk'+i.id]?'disabled':''}>${S.busy['mk'+i.id]?'<span class="spinner"></span> Drafting…':'Make carousel'}</button>
+      <button class="btn small" data-make-single="${esc(i.id)}">Make single post</button>
+      <button class="btn small" data-mark-used="${esc(i.id)}">Mark as used</button>
+      <button class="btn small ghost" data-edit-idea="${esc(i.id)}">Edit</button>
+    </div>
+  </article>`;
+}
+
+/* ---------- used ---------- */
+function viewUsed(){
+  const q=S.usedQuery.toLowerCase();
+  const used=S.ideas.filter(i=>i.status==='used').filter(i=>!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q)).sort((a,b)=>(b.postedOn||'').localeCompare(a.postedOn||''));
+  $('#main').innerHTML = `
+  <div class="view-head"><div><h1>Used ideas</h1><p>Everything you’ve already posted, so you never repeat yourself by accident.</p></div>
+  <div class="row"><label class="sr" for="used-q">Search used ideas</label><input id="used-q" class="pill-input" type="text" placeholder="Search" value="${esc(S.usedQuery)}" data-used-q></div></div>
+  ${used.length?`<div class="used-wrap"><table class="used-table"><thead><tr><th>Idea</th><th>Posted</th><th>Format</th><th>Link</th><th></th></tr></thead><tbody>
+    ${used.map(i=>`<tr><td><b style="font-weight:500">${esc(i.title)}</b>${i.notes?`<div style="color:var(--muted);font-size:13px">${br(i.notes)}</div>`:''}</td><td style="white-space:nowrap">${fmtDate(i.postedOn)}</td><td>${esc(i.format||'')}</td><td>${safeUrl(i.link)?`<a href="${esc(i.link)}" target="_blank" rel="noopener noreferrer">Open post</a>`:''}</td>
+    <td style="white-space:nowrap"><button class="btn small ghost" data-mark-used="${esc(i.id)}">Edit</button><button class="btn small ghost" data-restore="${esc(i.id)}">Move back</button></td></tr>`).join('')}
+  </tbody></table></div>`
+  : `<div class="empty"><h2>${q?'No matches':'Nothing posted yet'}</h2><p>${q?'Try a different word.':'When you post something, open the idea and choose “Mark as used”. It’ll land here.'}</p></div>`}`;
+}
+
+/* ---------- brand ---------- */
+const BRAND_SAMPLE=[{layout:'cover',bg:'photo',heading:'Buying your first home?',accent:'start here',button:'Swipe for more'},{layout:'list',bg:'sand',heading:'Before you tour homes',items:['Get pre-approved','Know your budget','List your must-haves']}];
+function viewBrand(){
+  const b=S.brand, C=(k,label)=>`<div class="color"><input type="color" value="${esc(b[k])}" data-color="${k}" aria-label="${label}"><div><div class="c-lbl">${label}</div><input type="text" value="${esc(b[k])}" data-color-text="${k}" aria-label="${label} hex code"></div></div>`;
+  const hs=imgSrc(b.headshotId,b.headshotData);
+  $('#main').innerHTML = `
+  <div class="view-head"><div><h1>Brand settings</h1><p>Every slide pulls its fonts and colours from here. Change something and all your designs update.</p></div></div>
+  <div class="brand-grid">
+    <div class="brand-form">
+      <section><h2>You</h2>
+        <div class="headshot-row"><div class="hs" style="${hs?`background-image:url('${hs}')`:''}"></div><div class="row"><label class="btn small" for="hs-in">${hs?'Replace headshot':'Upload headshot'}</label><input type="file" id="hs-in" accept="image/*" class="sr" data-headshot>${hs?'<button class="btn small ghost" data-act="rm-headshot">Remove</button>':''}</div></div>
+        <div class="field"><label for="b-name">Name</label><input type="text" id="b-name" data-brand="name" value="${esc(b.name)}"></div>
+        <div class="field"><label for="b-handle">Handle</label><input type="text" id="b-handle" data-brand="handle" value="${esc(b.handle)}"></div>
+        <div class="field"><label for="b-extra">Line under your name</label><input type="text" id="b-extra" data-brand="extra" value="${esc(b.extra)}"><span class="hint">For example your title and brokerage.</span></div>
+      </section>
+      <section><h2>Colours</h2><div class="colors">${C('bg','Background')}${C('card','Card')}${C('accent','Accent')}${C('ink','Text')}${C('soft','Soft tint')}</div></section>
+      <section><h2>Fonts</h2>
+        <div class="field"><label for="b-df">Headline font</label><input type="text" id="b-df" data-brand="displayFont" value="${esc(b.displayFont)}"><span class="hint">Any Google Fonts name, or a font you upload below.</span></div>
+        <div class="field"><label for="b-bf">Body font</label><input type="text" id="b-bf" data-brand="bodyFont" value="${esc(b.bodyFont)}"></div>
+        <div class="field"><label for="b-sf">Accent font</label><input type="text" id="b-sf" data-brand="scriptFont" value="${esc(b.scriptFont)}"><span class="hint">Optional. Used for the italic line. Leave empty to use the headline font in italics.</span></div>
+        <div class="field"><span class="lbl">Uploaded fonts</span>
+          ${(b.fontFiles||[]).length?`<div class="row">${b.fontFiles.map((f,k)=>`<span class="badge">${esc(f.family)} <button class="btn small ghost" style="padding:0 6px;min-height:0" data-rm-font="${k}" aria-label="Remove ${esc(f.family)}">×</button></span>`).join('')}</div>`:''}
+          <div class="row"><input type="text" id="font-fam" class="pill-input" placeholder="Font name"><label class="btn small" for="font-in">Upload font file</label><input type="file" id="font-in" accept=".ttf,.otf,.woff,.woff2" class="sr" data-fontfile></div>
+          <span class="hint">TTF, OTF or WOFF. Type the name first, then use that same name in the boxes above. For the Canva file, use fonts Canva also has (or that you’ve uploaded to Canva) so they carry over.</span></div>
+      </section>
+      <section><h2>Backup</h2>
+        <p style="margin:0;color:var(--muted);font-size:14px">${Store.mode==='db'?'Download everything (designs, ideas, photos and brand settings) as one file. Use it to move your studio to your own website, or just to keep a safe copy.':'Everything here is saved on this device only. Download a backup regularly, and use Restore to bring a backup into this studio.'}</p>
+        <div class="row"><button class="btn" data-act="backup">Download backup</button>${Store.mode==='db'?'':'<label class="btn" for="restore-in">Restore from backup</label><input type="file" id="restore-in" accept=".json,application/json" class="sr" data-restore-file>'}</div>
+      </section>
+    </div>
+    <div class="brand-preview" id="brand-preview">${BRAND_SAMPLE.map((s,k)=>frameHTML(s,k,2)).join('')}</div>
+  </div>`;
+}
+function refreshBrandPreview(){
+  const p=$('#brand-preview'); if(!p) return;
+  p.querySelectorAll('.brand-scope').forEach((el,k)=>{ el.setAttribute('style',brandVars()); el.innerHTML=slideHTML(BRAND_SAMPLE[k],k,2); });
+}
+
+/* =========================== images =========================== */
+function downscale(file,max=1600){
+  return new Promise((res,rej)=>{
+    const img=new Image(); const url=URL.createObjectURL(file);
+    img.onload=()=>{ const k=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); c.toBlob(b=>b?res(b):rej(new Error('encode')),'image/jpeg',.86); };
+    img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('read')); };
+    img.src=url;
+  });
+}
+const blobToData = b => new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(b); });
+async function storeImage(file){
+  const blob = await downscale(file);
+  const assets = await getCap('assets');
+  if(assets){ try{ const a = await assets.upload(blob); return {id:a.id, data:''}; }catch(e){} }
+  return {id:'', data: await blobToData(blob)};
+}
+function loadImg(src){ return new Promise(r=>{ const i=new Image(); if(!src.startsWith('data:')) i.crossOrigin='anonymous'; i.onload=()=>r(i); i.onerror=()=>r(null); i.src=src; }); }
+async function cropToData(src, tw, th){
+  const img=await loadImg(src); if(!img) return '';
+  const c=document.createElement('canvas'); c.width=tw; c.height=th;
+  const k=Math.max(tw/img.width, th/img.height), w=img.width*k, h=img.height*k;
+  c.getContext('2d').drawImage(img,(tw-w)/2,(th-h)/2,w,h);
+  try{ return c.toDataURL('image/jpeg',.88).replace(/^data:/,''); }catch(e){ return ''; }
+}
+
+/* =========================== export =========================== */
+function makeHost(fmt){
+  const host=document.createElement('div'); host.className='export-host brand-scope'; host.setAttribute('style',brandVars()+`height:${DIM[fmt].h}px;`);
+  document.body.appendChild(host); return host;
+}
+async function fontsReady(){
+  await document.fonts.ready;
+  const b=S.brand; await Promise.all([b.displayFont,b.bodyFont,b.scriptFont].filter(Boolean).flatMap(f=>[`500 80px "${f}"`,`italic 400 60px "${f}"`,`400 36px "${f}"`]).map(q=>document.fonts.load(q).catch(()=>{})));
+}
+function waitForBackgrounds(root){
+  const urls=[...root.querySelectorAll('[style*="background-image"]')].map(bgUrl).filter(Boolean);
+  return Promise.all(urls.map(loadImg));
+}
+function bgUrl(el){ const m=(el.style.backgroundImage||getComputedStyle(el).backgroundImage||'').match(/url\(["']?(.*?)["']?\)/); return m?m[1]:''; }
+async function exportPNG(indices){
+  const car=curCar(); if(!car) return;
+  if(typeof html2canvas!=='function'){ toast('The image exporter didn’t load. Reload the page and try again.'); return; }
+  const fmt=fmtOf(car), dim=DIM[fmt];
+  toast(indices.length>1?'Preparing your images…':'Preparing your image…');
+  const host=makeHost(fmt);
+  try{
+    await fontsReady();
+    const out=[];
+    for(const k of indices){
+      host.innerHTML=slideHTML(car.slides[k],k,car.slides.length,fmt);
+      await waitForBackgrounds(host);
+      const canvas = await html2canvas(host.firstElementChild,{scale:1,useCORS:true,backgroundColor:null,logging:false,width:dim.w,height:dim.h,windowWidth:1200,windowHeight:dim.h+50});
+      out.push(await new Promise(r=>canvas.toBlob(r,'image/png')));
+    }
+    const base=slug(car.title)+(fmt==='story'?'-story':'');
+    if(out.length===1) await saveFile({filename:`${base}${car.slides.length>1?'-'+(indices[0]+1):''}.png`,data:out[0]});
+    else {
+      if(typeof JSZip!=='function'){ toast('The zip tool didn’t load. Download images one at a time.'); return; }
+      const zip=new JSZip(); out.forEach((blob,k)=>zip.file(`${base}-${String(k+1).padStart(2,'0')}.png`,blob));
+      await saveFile({filename:`${base}.zip`,data:await zip.generateAsync({type:'blob'})});
+    }
+    toast('Downloaded');
+  }catch(e){ dlError(e); }
+  finally{ host.remove(); }
+}
+function dlError(e){
+  const code=e&&e.code;
+  toast(code==='declined'?'Download cancelled.':code==='rate_limited'?'A download is already waiting for you. Try again in a moment.':code==='unavailable'?'Downloads aren’t available in this view.':'The download didn’t work. Try again.');
+}
+/* ---- backup and restore ---- */
+async function exportBackup(){
+  toast('Packing up your studio. This can take a moment…');
+  try{
+    const cache={};
+    const toData = async (id,data) => { if(data) return data; if(!id) return ''; if(!(id in cache)){ try{ const r=await fetch('/_blob/'+id); cache[id]= r.ok ? await blobToData(await r.blob()) : ''; }catch(err){ cache[id]=''; } } return cache[id]; };
+    const photos=[]; for(const p of S.photos){ photos.push({...clone(p), data:await toData(p.assetId,p.data), assetId:''}); }
+    const carousels=[]; for(const c of S.carousels){ const cc=clone(c); for(const s of (cc.slides||[])){ if(s.photoId||s.photoData){ s.photoData=await toData(s.photoId,s.photoData); s.photoId=''; } } carousels.push(cc); }
+    const brand=clone(S.brand);
+    if(brand.headshotId||brand.headshotData){ brand.headshotData=await toData(brand.headshotId,brand.headshotData); brand.headshotId=''; }
+    brand.fontFiles=[]; for(const f of (S.brand.fontFiles||[])) brand.fontFiles.push({family:f.family, assetId:'', data:await toData(f.assetId,f.data)});
+    const out={app:'content-studio', version:1, exportedAt:new Date().toISOString(), brand, ideas:clone(S.ideas), carousels, photos};
+    await saveFile({filename:`content-studio-backup-${todayISO()}.json`, data:new Blob([JSON.stringify(out)],{type:'application/json'})});
+    toast('Backup downloaded');
+  }catch(e){ dlError(e); }
+}
+async function importBackup(file){
+  let j; try{ j=JSON.parse(await file.text()); }catch(e){ j=null; }
+  if(!j || j.app!=='content-studio'){ toast('That file isn’t a Content Studio backup.'); return; }
+  if(!confirm('Replace everything in this studio with the backup? Designs, ideas, photos and brand settings here will be overwritten.')) return;
+  S.ideas=j.ideas||[]; S.carousels=j.carousels||[]; S.photos=j.photos||[]; S.brand={...clone(DEFAULT_BRAND), ...(j.brand||{})};
+  for(const k of ['ideas','carousels','photos','brand']) await Store.saveLocal(k,true);
+  applyBrand(); render(); toast(`Backup restored: ${S.carousels.length} designs, ${S.ideas.length} ideas, ${S.photos.length} photos`);
+}
+/* ---- editable file for Canva (PowerPoint format) ---- */
+function parseColor(str){
+  if(!str) return null; str=str.trim();
+  let m=str.match(/^#([0-9a-f]{6})$/i); if(m){ const n=parseInt(m[1],16); return {r:n>>16,g:(n>>8)&255,b:n&255,a:1}; }
+  m=str.match(/rgba?\(([^)]+)\)/); if(!m) return null;
+  const p=m[1].split(/[\s,\/]+/).filter(Boolean).map(parseFloat);
+  return {r:p[0],g:p[1],b:p[2],a:p.length>3?p[3]:1};
+}
+const mix=(f,b,a)=>({r:f.r*a+b.r*(1-a),g:f.g*a+b.g*(1-a),b:f.b*a+b.b*(1-a),a:1});
+const hex=c=>[c.r,c.g,c.b].map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('').toUpperCase();
+function effOpacity(el,root){ let o=1,n=el; while(n&&n!==root){ o*=parseFloat(getComputedStyle(n).opacity)||1; n=n.parentElement; } return o; }
+function behindColor(el,root){
+  let n=el.parentElement;
+  while(n && n!==root.parentElement){ const c=parseColor(getComputedStyle(n).backgroundColor); if(c && c.a>0.01) return c; n=n.parentElement; }
+  return parseColor(S.brand.bg)||{r:234,g:225,b:213,a:1};
+}
+function leafText(el){
+  for(const c of el.children){ if(c.tagName!=='BR') return ''; }
+  const t=(el.innerText||'').replace(/\u00a0/g,' ').trim();
+  return t;
+}
+function firstFamily(f){ return (f||'').split(',')[0].replace(/["']/g,'').trim() || 'Arial'; }
+async function exportPptx(){
+  const d=curCar(); if(!d) return;
+  if(typeof PptxGenJS!=='function'){ toast('The Canva file tool didn’t load. Reload the page and try again.'); return; }
+  toast('Building your editable file…');
+  const fmt=fmtOf(d), dim=DIM[fmt], W=10, H=+(W*dim.h/dim.w).toFixed(4), pxIn=W/dim.w, pxPt=pxIn*72;
+  const pptx=new PptxGenJS(); pptx.defineLayout({name:'SOCIAL',width:W,height:H}); pptx.layout='SOCIAL'; pptx.title=d.title||'Post';
+  const host=makeHost(fmt);
+  try{
+    await fontsReady();
+    for(let k=0;k<d.slides.length;k++){
+      host.innerHTML=slideHTML(d.slides[k],k,d.slides.length,fmt);
+      await waitForBackgrounds(host);
+      const root=host.querySelector('.slide'), R=root.getBoundingClientRect();
+      const sl=pptx.addSlide();
+      const rootBg=parseColor(getComputedStyle(root).backgroundColor);
+      const isPhoto=root.classList.contains('bg-photo');
+      sl.background={color: hex(rootBg&&rootBg.a>0.01 ? rootBg : parseColor(isPhoto?S.brand.soft:S.brand.bg))};
+      const ph=root.querySelector('.ph'), phSrc=ph?bgUrl(ph):'';
+      if(phSrc){ const data=await cropToData(phSrc, dim.w, dim.h); if(data) sl.addImage({data,x:0,y:0,w:W,h:H}); }
+      for(const el of root.querySelectorAll('*')){
+        if(el.classList.contains('ph')||el.classList.contains('ph-veil')||el.tagName==='BR') continue;
+        const cs=getComputedStyle(el); if(cs.display==='none'||cs.visibility==='hidden') continue;
+        const r=el.getBoundingClientRect(); if(r.width<1||r.height<1) continue;
+        const b={x:(r.left-R.left)*pxIn, y:(r.top-R.top)*pxIn, w:r.width*pxIn, h:r.height*pxIn};
+        const op=effOpacity(el,root), behind=behindColor(el,root);
+        const bg=parseColor(cs.backgroundColor), bw=parseFloat(cs.borderTopWidth)||0, bc=parseColor(cs.borderTopColor);
+        const radius=parseFloat(cs.borderTopLeftRadius)||0;
+        const isCircle = radius>=Math.min(r.width,r.height)/2-1 && Math.abs(r.width-r.height)<3;
+        const hasFill=bg&&bg.a>0.01, hasLine=bw>0.5&&bc&&bc.a>0.01;
+        const img=el.classList.contains('headshot')?bgUrl(el):'';
+        if(el.classList.contains('headshot')){
+          const ring = hasLine ? hex(mix(bc,behind,op)) : null;
+          if(img){
+            if(ring) sl.addShape(pptx.ShapeType.ellipse,{...b, fill:{color:ring}});
+            const ins=bw*pxIn; const data=await cropToData(img,600,600); if(data) sl.addImage({data,x:b.x+ins,y:b.y+ins,w:b.w-2*ins,h:b.h-2*ins,rounding:true});
+          } else {
+            sl.addShape(pptx.ShapeType.ellipse,{...b, fill:{color:hex(parseColor(S.brand.soft))}, ...(ring?{line:{color:ring,width:+(bw*pxPt).toFixed(2)}}:{})});
+          }
+          continue;
+        }
+        const shapeType = isCircle ? pptx.ShapeType.ellipse : (radius>0.5 ? pptx.ShapeType.roundRect : pptx.ShapeType.rect);
+        const fillColor = hasFill ? mix(bg,behind,op*bg.a) : null;
+        const shape = (hasFill||hasLine) ? {
+          shape: shapeType,
+          ...(fillColor ? {fill:{color:hex(fillColor)}} : {}),
+          ...(hasLine ? {line:{color:hex(mix(bc,behind,op*bc.a)), width:Math.max(.5,+(bw*pxPt).toFixed(2))}} : {}),
+          ...(radius>0.5 && !isCircle ? {rectRadius:+(Math.min(radius,r.height/2,r.width/2)*pxIn).toFixed(3)} : {})
+        } : null;
+        const text=leafText(el);
+        if(text){
+          const tc=parseColor(cs.color)||{r:0,g:0,b:0,a:1};
+          const under = fillColor || behind;
+          const fs=parseFloat(cs.fontSize)||16, lh=cs.lineHeight==='normal'?fs*1.2:(parseFloat(cs.lineHeight)||fs*1.2);
+          const ta=cs.textAlign, align = (ta==='right'||ta==='end')?'right':(ta==='left'||ta==='start')?'left':'center';
+          const o={fontFace:firstFamily(cs.fontFamily), fontSize:+(fs*pxPt).toFixed(1), color:hex(mix(tc,under,op*tc.a)), italic:cs.fontStyle==='italic', bold:(parseInt(cs.fontWeight)||400)>=600, align, lineSpacingMultiple:+(lh/fs).toFixed(2), wrap:true, fit:'none', charSpacing:+((parseFloat(cs.letterSpacing)||0)*pxPt).toFixed(2)||undefined};
+          if(shape){ const pl=parseFloat(cs.paddingLeft)||0, pr=parseFloat(cs.paddingRight)||0; Object.assign(o,shape,b,{valign:'middle',margin:[+(pl*pxPt).toFixed(1),+(pr*pxPt).toFixed(1),0,0]}); }
+          else { const extra=b.w*0.06; let x=b.x; if(align==='center') x-=extra/2; else if(align==='right') x-=extra; Object.assign(o,{x,y:b.y,w:b.w+extra,h:b.h*1.12,valign:'top',margin:[0,0,0,0]}); }
+          if(o.charSpacing===undefined) delete o.charSpacing;
+          sl.addText(text,o);
+        } else if(shape){
+          const {shape:st,...rest}=shape; sl.addShape(st,{...b,...rest});
+        }
+      }
+    }
+    const blob=await pptx.write({outputType:'blob'});
+    await saveFile({filename:`${slug(d.title)}${fmt==='story'?'-story':''}-for-canva.pptx`, data:blob});
+    toast('Downloaded. In Canva, choose Import file and pick this .pptx.');
+  }catch(e){ dlError(e); }
+  finally{ host.remove(); }
+}
+function downloadDialog(){
+  const car=curCar(); if(!car) return; const n=car.slides.length;
+  showDialog(`<h2>Download</h2>
+    <div class="dl-opts">
+      <button class="dl-opt" data-dl="pptx"><b>Editable file for Canva</b><span>A PowerPoint file (.pptx) with ${n>1?`all ${n} slides`:'your post'}. In Canva, choose Import file and pick it. Text, shapes and photos stay editable.</span></button>
+      <button class="dl-opt" data-dl="png-one"><b>${n>1?'This slide as an image':'Image'}</b><span>PNG, ready to post</span></button>
+      ${n>1?`<button class="dl-opt" data-dl="png-all"><b>All slides as images</b><span>A ZIP of ${n} PNGs, numbered in order</span></button>`:''}
+    </div>
+    <div class="row end"><button class="btn ghost" data-close>Close</button></div>`);
+}
+
+/* =========================== Claude helpers =========================== */
+async function brainstorm(){
+  const theme=(S.bsTheme||'').trim();
+  const sample=await getCap('sample');
+  if(!sample){ toast('Brainstorming isn’t available in this view.'); return; }
+  S.busy.bs=true; render();
+  try{
+    const existing=S.ideas.map(i=>i.title).slice(0,80);
+    const prompt=`You help a friendly real estate agent in Toronto and the GTA plan short educational social media posts (reels and carousels) for new and first-time home buyers.
+Theme: ${theme||'any useful topic for first-time buyers in Toronto and the GTA'}
+Suggest 5 fresh post ideas. Avoid repeating or closely overlapping these existing ideas: ${JSON.stringify(existing)}.
+Rules: do NOT state any specific numbers, dollar amounts, dates, rates or legal rules as fact. Instead, list in "toVerify" exactly what needs to be fact-checked from current official sources before posting. Keep the hook warm, friendly and under 15 words.
+Respond with JSON only: {"ideas":[{"title":"...","hook":"...","angle":"one sentence on why buyers care","toVerify":["..."]}]}`;
+    const res=await sample.json(prompt,{modelTier:'default'});
+    S.suggestions=(res&&Array.isArray(res.ideas)?res.ideas:[]).filter(x=>x&&x.title).slice(0,6);
+    if(!S.suggestions.length) toast('No ideas came back. Try a different theme.');
+  }catch(e){
+    toast(e&&e.code==='not_granted'?'Brainstorming needs your permission to ask Claude.':e&&e.code==='rate_limited'?'Too many requests just now. Try again in a minute.':'Brainstorming didn’t work this time. Try again.');
+  }finally{ S.busy.bs=false; render(); }
+}
+async function makeCarousel(idea){
+  const sample=await getCap('sample');
+  if(!sample || !(idea.facts||[]).length){ newDesign({kind:'carousel',idea,slides:templateFromIdea(idea)}); return; }
+  S.busy['mk'+idea.id]=true; render();
+  try{
+    const prompt=`Turn this researched topic into an Instagram carousel for a warm, friendly real estate agent in Toronto and the GTA. Audience: new home buyers.
+Topic: ${idea.title}
+Hook: ${idea.hook||''}
+Facts (the ONLY facts you may use; never add numbers, dates, amounts or rules that are not here, and do not change any number):
+${(idea.facts||[]).map(f=>'- '+f).join('\n')}
+Write 5 to 7 slides. Tone: warm, welcoming, expert, plain language, fun but not jokey. Keep headlines short (under 8 words) and body text under 30 words.
+Available layouts: "cover" (first slide), "statement", "list" (items array, 2 to 5 short items), "steps" (only if the order truly matters), "stat" (one big number copied exactly from the facts, in "number"), "mythfact" ("myth" and "fact"), "cta" (last slide; invite them to send a DM).
+Respond with JSON only: {"slides":[{"layout":"cover","heading":"","accent":"","body":"","items":[],"number":"","myth":"","fact":"","button":""}]}`;
+    const res=await sample.json(prompt,{modelTier:'default'});
+    const bgs=['sand','white','sand','taupe','white','sand'];
+    let slides=(res&&Array.isArray(res.slides)?res.slides:[]).filter(s=>s&&LAYOUTS[s.layout]).slice(0,8).map((s,k)=>({
+      id:uid('s'),layout:s.layout,bg:s.layout==='cover'?'photo':s.layout==='cta'?'white':bgs[k%bgs.length],
+      heading:s.heading||'',accent:s.accent||'',body:s.body||'',items:Array.isArray(s.items)?s.items.map(String):[],number:s.number||'',myth:s.myth||'',fact:s.fact||'',button:s.button||''}));
+    if(slides.length<2) slides=templateFromIdea(idea);
+    if(idea.footnote) slides[slides.length-1].footnote=idea.footnote;
+    S.busy['mk'+idea.id]=false;
+    newDesign({kind:'carousel',idea,slides});
+    toast('Draft ready. Read every slide before you post.');
+  }catch(e){
+    S.busy['mk'+idea.id]=false;
+    toast('Claude couldn’t draft this one, so here’s a simple starting point.');
+    newDesign({kind:'carousel',idea,slides:templateFromIdea(idea)});
+  }
+}
+function templateFromIdea(idea){
+  return [
+    {id:uid('s'),layout:'cover',bg:'photo',heading:idea.title,accent:'',body:'',button:'Swipe for more',items:[]},
+    {id:uid('s'),layout:'list',bg:'sand',heading:'What to know',items:(idea.facts||[]).slice(0,4),body:''},
+    {id:uid('s'),layout:'cta',bg:'white',heading:'Questions? Let’s talk.',body:'Send me a message and we’ll go through it together.',button:'Send me a DM',items:[],footnote:idea.footnote||''}
+  ];
+}
+
+/* =========================== dialogs =========================== */
+function showDialog(html){ const d=$('#dlg'); d.innerHTML=html; if(!d.open) d.showModal(); }
+function closeDialog(){ const d=$('#dlg'); if(d.open) d.close(); }
+function ideaDialog(idea){
+  const i=idea||{status:'research'};
+  showDialog(`<h2>${idea?'Edit idea':'Add an idea'}</h2><form id="idea-form">
+    <div class="field"><label for="d-title">Title</label><input type="text" id="d-title" name="title" required value="${esc(i.title||'')}"></div>
+    <div class="field"><label for="d-hook">Hook</label><input type="text" id="d-hook" name="hook" value="${esc(i.hook||'')}"><span class="hint">The first line people hear or see.</span></div>
+    <div class="field"><label for="d-facts">Facts, one per line</label><textarea id="d-facts" name="facts" rows="5">${esc((i.facts||[]).join('\n'))}</textarea></div>
+    <div class="field"><label for="d-src">Sources, one per line</label><textarea id="d-src" name="sources" rows="3" placeholder="Label | https://…">${esc((i.sources||[]).map(s=>s.url?`${s.label} | ${s.url}`:s.label).join('\n'))}</textarea></div>
+    <div class="field"><label for="d-timely">Timing note</label><input type="text" id="d-timely" name="timely" value="${esc(i.timely||'')}" placeholder="e.g. Post before Dec 31"></div>
+    <div class="field"><label for="d-notes">Notes</label><textarea id="d-notes" name="notes" rows="2">${esc(i.notes||'')}</textarea></div>
+    <div class="field"><label for="d-status">Status</label><select id="d-status" name="status">${Object.entries(STATUS).map(([k,v])=>`<option value="${k}" ${i.status===k?'selected':''}>${v}</option>`).join('')}</select></div>
+    <div class="row end">${idea?'<button class="btn ghost danger" type="button" data-del-idea>Delete idea</button>':''}<button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit">${idea?'Save changes':'Add idea'}</button></div>
+  </form>`);
+  const form=$('#idea-form');
+  form.addEventListener('submit',e=>{
+    e.preventDefault();
+    const fd=new FormData(form);
+    const lines=k=>String(fd.get(k)||'').split('\n').map(x=>x.trim()).filter(Boolean);
+    const next={...(idea||{}), id:idea?idea.id:uid('i'), title:String(fd.get('title')).trim(), hook:String(fd.get('hook')||'').trim(), facts:lines('facts'),
+      sources:lines('sources').map(l=>{ const [a,b]=l.split('|').map(x=>x.trim()); return b?{label:a,url:b}:(/^https?:/.test(a)?{label:a,url:a}:{label:a}); }),
+      timely:String(fd.get('timely')||'').trim(), notes:String(fd.get('notes')||'').trim(), status:String(fd.get('status')),
+      order: idea?idea.order:Date.now(), createdAt: idea?idea.createdAt:new Date().toISOString()};
+    Store.putIdea(next); closeDialog(); render(); toast(idea?'Idea saved':'Idea added');
+  });
+  const del=$('[data-del-idea]'); if(del) del.addEventListener('click',()=>{ if(confirm('Delete this idea for good?')){ Store.delIdea(idea.id); closeDialog(); render(); } });
+}
+function usedDialog(idea){
+  showDialog(`<h2>${idea.status==='used'?'Edit post details':'Mark as used'}</h2><form id="used-form">
+    <p style="margin:0;color:var(--muted)">${esc(idea.title)}</p>
+    <div class="field"><label for="u-date">Posted on</label><input type="date" id="u-date" name="postedOn" value="${esc(idea.postedOn||todayISO())}"></div>
+    <div class="field"><label for="u-format">Format</label><select id="u-format" name="format">${FORMATS.map(f=>`<option ${idea.format===f?'selected':''}>${f}</option>`).join('')}</select></div>
+    <div class="field"><label for="u-link">Link to the post</label><input type="url" id="u-link" name="link" value="${esc(idea.link||'')}" placeholder="https://www.instagram.com/…"></div>
+    <div class="field"><label for="u-notes">Notes</label><textarea id="u-notes" name="notes" rows="2" placeholder="How it did, what to try next time">${esc(idea.notes||'')}</textarea></div>
+    <div class="row end"><button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit">${idea.status==='used'?'Save':'Mark as used'}</button></div>
+  </form>`);
+  const form=$('#used-form');
+  form.addEventListener('submit',e=>{
+    e.preventDefault(); const fd=new FormData(form);
+    Store.putIdea({...idea, prevStatus: idea.status==='used'?(idea.prevStatus||'research'):idea.status, status:'used', postedOn:String(fd.get('postedOn')||todayISO()), format:String(fd.get('format')||''), link:String(fd.get('link')||'').trim(), notes:String(fd.get('notes')||'').trim()});
+    closeDialog(); render(); if(idea.status!=='used') toast('Moved to Used ideas');
+  });
+}
+
+/* =========================== events =========================== */
+document.addEventListener('click', async e=>{
+  const t=e.target.closest('button,[data-open]'); if(!t) return;
+  const d=t.dataset;
+  if(d.close!==undefined){ closeDialog(); return; }
+  if(d.nav){ go(d.nav); return; }
+  if(d.open){ openEditor(d.open); return; }
+  if(d.slide!==undefined){ S.slideIdx=+d.slide; S.sel=null; render(); return; }
+  if(d.filter){ S.ideaFilter=d.filter; render(); return; }
+  if(d.storyCopy){ const c=S.carousels.find(x=>x.id===d.storyCopy); if(c) copyDesign(c.id, fmtOf(c)==='story'?'post':'story'); return; }
+  if(d.dup){ copyDesign(d.dup); return; }
+  if(d.makeCar){ const i=S.ideas.find(x=>x.id===d.makeCar); if(i) makeCarousel(i); return; }
+  if(d.makeSingle){ const i=S.ideas.find(x=>x.id===d.makeSingle); if(i) newDesign({kind:'single',idea:i,slides:[{id:uid('s'),layout:'cover',bg:'photo',heading:i.title,accent:'',body:i.hook||'',button:'',items:[],footnote:i.footnote||''}]}); return; }
+  if(d.markUsed){ const i=S.ideas.find(x=>x.id===d.markUsed); if(i) usedDialog(i); return; }
+  if(d.editIdea){ const i=S.ideas.find(x=>x.id===d.editIdea); if(i) ideaDialog(i); return; }
+  if(d.restore){ const i=S.ideas.find(x=>x.id===d.restore); if(i){ Store.putIdea({...i,status:i.prevStatus||'research'}); render(); toast('Moved back to Idea research'); } return; }
+  if(d.saveSug!==undefined){ const g=S.suggestions[+d.saveSug]; if(g){ Store.putIdea({id:uid('i'),title:g.title,hook:g.hook||'',facts:[],notes:[g.angle,(g.toVerify||[]).length?'To verify: '+g.toVerify.join('; '):''].filter(Boolean).join('\n'),sources:[],status:'unverified',order:Date.now(),createdAt:new Date().toISOString()}); S.suggestions.splice(+d.saveSug,1); render(); toast('Saved as “Needs fact-check”'); } return; }
+  if(d.newFromPhoto){ const p=libraryPhotos().find(x=>x.id===d.newFromPhoto); if(p) newDesign({kind:'single',slides:[{id:uid('s'),layout:'cover',bg:'photo',heading:'Your headline here',accent:'a short supporting line',items:[],photoId:p.assetId||'',photoData:p.assetId?'':(p.data||'')}]}); return; }
+  if(d.photoCat){ S.photoCat=d.photoCat; render(); return; }
+  if(d.pickCat){ S.pickCat=d.pickCat; photoPicker(); return; }
+  if(d.delPhoto){ const p=S.photos.find(x=>x.id===d.delPhoto); const n=(usageMap()[p&&(p.assetId||p.data)]||0); if(p && confirm(n?`This photo is ${usedLabel(n).toLowerCase()}. Delete it anyway? Those posts will lose their background photo.`:'Delete this photo?')){
+      if(p.assetId){ const a=await getCap('assets'); if(a){ try{ await a.delete(p.assetId); }catch(err){} } }
+      S.carousels.forEach(c=>{ let ch=false; (c.slides||[]).forEach(s=>{ if((p.assetId&&s.photoId===p.assetId)||(p.data&&s.photoData===p.data)){ s.photoId=''; s.photoData=''; ch=true; } }); if(ch) Store.queueCarousel(c,0); });
+      await Store.delPhoto(p.id); render(); toast('Photo deleted'); } return; }
+  if(d.pick!==undefined){ applyPhoto((S.pickList||[])[+d.pick]); return; }
+  if(d.dl){ closeDialog(); if(d.dl==='pptx') exportPptx(); else if(d.dl==='png-one') exportPNG([S.slideIdx]); else exportPNG(curCar().slides.map((_,k)=>k)); return; }
+  if(d.fmt){ const car=curCar(); if(car && fmtOf(car)!==d.fmt){ car.format=d.fmt; Store.queueCarousel(car); render(); } return; }
+  if(d.align){ setAlign(d.align); return; }
+  if(d.layout||d.bg){ const car=curCar(); const s=car.slides[S.slideIdx]; if(d.layout){ s.layout=d.layout; S.sel=null; } if(d.bg) s.bg=d.bg; Store.queueCarousel(car); render(); if(d.bg==='photo' && !imgSrc(s.photoId,s.photoData)) photoPicker(); return; }
+  if(d.rmFont!==undefined){ S.brand.fontFiles.splice(+d.rmFont,1); applyBrand(); Store.queueBrand(); render(); return; }
+  const car=curCar();
+  switch(d.act){
+    case 'new-car': newDesign({kind:'carousel'}); break;
+    case 'new-single': newDesign({kind:'single'}); break;
+    case 'to-carousel': car.kind='carousel'; car.slides.push({id:uid('s'),layout:'cta',bg:'white',heading:'Questions? Let’s talk.',body:'Send me a message any time.',button:'Send me a DM',items:[]}); Store.queueCarousel(car); render(); toast('Now a carousel. It’s in the Carousels section.'); break;
+    case 'add-idea': ideaDialog(null); break;
+    case 'brainstorm': brainstorm(); break;
+    case 'download': downloadDialog(); break;
+    case 'pick-photo': photoPicker(); break;
+    case 'center-all': centerAll(); break;
+    case 'reset-layout': { const s=curSlide(); s.pos={}; s.align={}; Store.queueCarousel(car); refreshPreview(); toast('Layout reset'); break; }
+    case 'deselect': S.sel=null; markSel(); break;
+    case 'count-minus': setCount(car.slides.length-1); break;
+    case 'count-plus': setCount(car.slides.length+1); break;
+    case 'prev': S.slideIdx=Math.max(0,S.slideIdx-1); S.sel=null; render(); break;
+    case 'next': S.slideIdx=Math.min(car.slides.length-1,S.slideIdx+1); S.sel=null; render(); break;
+    case 'add-slide': car.slides.splice(S.slideIdx+1,0,{id:uid('s'),layout:'statement',bg:'sand',heading:'New slide',body:'',items:[]}); S.slideIdx++; S.sel=null; Store.queueCarousel(car); render(); break;
+    case 'dup-slide': car.slides.splice(S.slideIdx+1,0,{...clone(car.slides[S.slideIdx]),id:uid('s')}); S.slideIdx++; Store.queueCarousel(car); render(); break;
+    case 'up-slide': if(S.slideIdx>0){ const k=S.slideIdx; [car.slides[k-1],car.slides[k]]=[car.slides[k],car.slides[k-1]]; S.slideIdx--; Store.queueCarousel(car); render(); } break;
+    case 'down-slide': if(S.slideIdx<car.slides.length-1){ const k=S.slideIdx; [car.slides[k+1],car.slides[k]]=[car.slides[k],car.slides[k+1]]; S.slideIdx++; Store.queueCarousel(car); render(); } break;
+    case 'del-slide': if(car.slides.length<=1){ toast('A design needs at least one slide.'); break; } if(confirm('Delete this slide?')){ car.slides.splice(S.slideIdx,1); S.sel=null; Store.queueCarousel(car); render(); } break;
+    case 'rm-photo': { const s=curSlide(); s.photoId=''; s.photoData=''; Store.queueCarousel(car); render(); break; }
+    case 'del-car': if(confirm('Delete this design for good?')){ const kind=car.kind; await Store.delCarousel(car.id); go(kind==='single'?'singles':'carousels'); toast('Deleted'); } break;
+    case 'backup': exportBackup(); break;
+    case 'rm-headshot': S.brand.headshotId=''; S.brand.headshotData=''; Store.queueBrand(); render(); break;
+  }
+});
+document.addEventListener('input', e=>{
+  const t=e.target, d=t.dataset;
+  if(d.field!==undefined){ const car=curCar(); if(!car) return; const s=car.slides[S.slideIdx];
+    s[d.field] = d.field==='items' ? t.value.split('\n') : t.value; Store.queueCarousel(car); refreshPreview(); return; }
+  if(d.carTitle!==undefined){ const car=curCar(); car.title=t.value; Store.queueCarousel(car); return; }
+  if(d.bs!==undefined){ S.bsTheme=t.value; return; }
+  if(d.usedQ!==undefined){ S.usedQuery=t.value; const pos=t.selectionStart; render(); const n=$('#used-q'); n.focus(); n.setSelectionRange(pos,pos); return; }
+  if(d.brand){ S.brand[d.brand]=t.value; if(d.brand.endsWith('Font')) loadGoogleFontDebounced(t.value); $('#bm-name').textContent=S.brand.name||'Content Studio'; Store.queueBrand(); refreshBrandPreview(); return; }
+  if(d.color){ S.brand[d.color]=t.value; const tx=document.querySelector(`[data-color-text="${d.color}"]`); if(tx) tx.value=t.value; Store.queueBrand(); refreshBrandPreview(); return; }
+  if(d.colorText){ let v=t.value.trim(); if(/^[0-9a-fA-F]{6}$/.test(v)) v='#'+v; if(/^#[0-9a-fA-F]{6}$/.test(v)){ S.brand[d.colorText]=v; const c=document.querySelector(`[data-color="${d.colorText}"]`); if(c) c.value=v; Store.queueBrand(); refreshBrandPreview(); } return; }
+});
+let gfTimer; function loadGoogleFontDebounced(v){ clearTimeout(gfTimer); gfTimer=setTimeout(()=>loadGoogleFont(v),700); }
+document.addEventListener('change', async e=>{
+  const t=e.target, d=t.dataset;
+  if(d.count!==undefined){ setCount(parseInt(t.value,10)); return; }
+  if(d.movePhoto){ const p=S.photos.find(x=>x.id===d.movePhoto); if(p && PHOTO_CATS[t.value]){ await Store.updatePhoto({...p,category:t.value}); render(); toast(`Moved to ${PHOTO_CATS[t.value]}`); } return; }
+  if(d.photoUpload!==undefined && t.files.length){ await uploadPhotos([...t.files], S.photoCat); t.value=''; if(S.view==='photos') render(); updateCounts(); return; }
+  if(d.pickUpload!==undefined && t.files.length){ const added=await uploadPhotos([...t.files], S.pickCat); if(added.length) applyPhoto(added[0]); return; }
+  if(d.headshot!==undefined && t.files[0]){ try{ const r=await storeImage(t.files[0]); S.brand.headshotId=r.id; S.brand.headshotData=r.data; Store.queueBrand(); render(); toast('Headshot added'); }catch(err){ toast('That image couldn’t be read. Try a JPG or PNG.'); } return; }
+  if(d.restoreFile!==undefined && t.files[0]){ await importBackup(t.files[0]); t.value=''; return; }
+  if(d.fontfile!==undefined && t.files[0]){
+    const famName=($('#font-fam').value||'').trim() || t.files[0].name.replace(/\.[^.]+$/,'');
+    const assets=await getCap('assets'); const entry={family:famName,assetId:'',data:''};
+    try{ if(assets){ const a=await assets.upload(t.files[0]); entry.assetId=a.id; } else { entry.data=await blobToData(t.files[0]); } }
+    catch(err){ toast('That font file couldn’t be uploaded.'); return; }
+    S.brand.fontFiles=[...(S.brand.fontFiles||[]).filter(f=>f.family!==famName),entry]; applyBrand(); Store.queueBrand(); render(); toast(`${famName} added. Use that name in a font box.`); return; }
+});
+document.addEventListener('focusout', e=>{ if(e.target.dataset && e.target.dataset.brand && e.target.dataset.brand.endsWith('Font')) loadGoogleFont(e.target.value); });
+document.addEventListener('keydown', e=>{
+  if(S.view!=='editor' || isTyping() || $('#dlg').open) return;
+  const car=curCar(); if(!car) return;
+  const arrows={ArrowLeft:[-1,0],ArrowRight:[1,0],ArrowUp:[0,-1],ArrowDown:[0,1]};
+  if(S.sel && arrows[e.key]){
+    e.preventDefault(); const s=curSlide(), step=e.shiftKey?50:10, [ax,ay]=arrows[e.key];
+    s.pos=s.pos||{}; const p=s.pos[S.sel]||{x:0,y:0}; p.x=(p.x||0)+ax*step; p.y=(p.y||0)+ay*step; s.pos[S.sel]=p;
+    Store.queueCarousel(car); refreshPreview(); return;
+  }
+  if(e.key==='Escape' && S.sel){ S.sel=null; markSel(); return; }
+  if(e.key==='ArrowRight' && S.slideIdx<car.slides.length-1){ S.slideIdx++; render(); }
+  if(e.key==='ArrowLeft' && S.slideIdx>0){ S.slideIdx--; render(); }
+});
+window.addEventListener('beforeunload',()=>{ Object.keys(Store.timers).forEach(k=>{ if(k.startsWith('car:')) Store.flushCarousel(k.slice(4)); }); Store.flushLocal(); });
+document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='hidden'){ Object.keys(Store.timers).forEach(k=>{ if(k.startsWith('car:')){ clearTimeout(Store.timers[k]); Store.flushCarousel(k.slice(4)); } }); Store.flushLocal(); } });
+
+/* =========================== start =========================== */
+render(); applyBrand();
+Store.init().then(()=>{ S.mode=Store.mode; applyBrand(); render(); });
+</script>
+</body>
+</html>
