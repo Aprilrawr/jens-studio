@@ -24,6 +24,7 @@
   --bg:#F6F2EC; --surface:#FFFFFF; --surface-2:#EFE8DF; --ink:#2F2924; --muted:#776A5F;
   --line:#E3D9CD; --accent:#8F755C; --accent-ink:#FFFFFF; --accent-soft:#E9DED1;
   --warn-bg:#F7E9D7; --warn-ink:#7A4E1C; --danger:#9C4434; --focus:#5E4A38; --sel:#2F6FDE;
+  --ok-bg:#E1EFE2; --ok-ink:#2D6838; --ok-line:#B9D7BD; --del-bg:#F7E4DF; --del-line:#E6C1B8;
   color-scheme:light;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -34,6 +35,7 @@
     --bg:#1D1A17; --surface:#27231F; --surface-2:#312B26; --ink:#F2ECE4; --muted:#B4A799;
     --line:#3E3730; --accent:#CDB295; --accent-ink:#1D1A17; --accent-soft:#3A322A;
     --warn-bg:#3B2E1E; --warn-ink:#F0CF9F; --danger:#E5937F; --focus:#E8D3B8; --sel:#7FA8F0;
+    --ok-bg:#1E3324; --ok-ink:#A6D9AF; --ok-line:#2F5238; --del-bg:#3A2420; --del-line:#5A332C;
     color-scheme:dark;
   }
 }
@@ -41,6 +43,7 @@
   --bg:#1D1A17; --surface:#27231F; --surface-2:#312B26; --ink:#F2ECE4; --muted:#B4A799;
   --line:#3E3730; --accent:#CDB295; --accent-ink:#1D1A17; --accent-soft:#3A322A;
   --warn-bg:#3B2E1E; --warn-ink:#F0CF9F; --danger:#E5937F; --focus:#E8D3B8; --sel:#7FA8F0;
+  --ok-bg:#1E3324; --ok-ink:#A6D9AF; --ok-line:#2F5238; --del-bg:#3A2420; --del-line:#5A332C;
   color-scheme:dark;
 }
 html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
@@ -93,6 +96,15 @@ main:focus{outline:none}
 .car-card .t{font-weight:500;line-height:1.3}
 .car-card .m{font-size:13px;color:var(--muted);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .car-card .acts{display:flex;gap:4px;padding:6px 8px 10px;flex-wrap:wrap}
+.car-card .acts-main{display:flex;gap:8px;justify-content:space-between;width:100%;padding:2px 0 4px}
+.car-card .acts-more{display:flex;gap:4px;flex-wrap:wrap;width:100%}
+.btn.pill-ok{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line);border-radius:999px;font-weight:500}
+.btn.pill-ok:hover{filter:brightness(.97)}
+.btn.pill-del{background:var(--del-bg);color:var(--danger);border:1px solid var(--del-line);border-radius:999px;font-weight:500}
+.btn.pill-del:hover{filter:brightness(.97)}
+.th-dup{position:absolute;top:32px;right:4px;z-index:3;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.th-dup svg{width:12px;height:12px}
+.th-dup:hover{border-color:var(--ink)}
 
 /* ---------- slide frames ---------- */
 .frame{position:relative;width:100%;aspect-ratio:4/5;overflow:hidden;background:#E9E1D6}
@@ -116,7 +128,18 @@ main:focus{outline:none}
 .thumbs{display:flex;flex-direction:column;gap:10px;position:sticky;top:16px;max-height:calc(100dvh - 32px);overflow:auto;padding:3px}
 .thumb{position:relative;border:0;padding:0;background:none;cursor:pointer;border-radius:10px;overflow:hidden;box-shadow:0 0 0 1px var(--line);flex:0 0 auto}
 .thumb[aria-current="true"]{box-shadow:0 0 0 3px var(--accent)}
-.thumb .num{position:absolute;left:6px;top:6px;z-index:2;background:var(--surface);color:var(--ink);font-size:11px;line-height:1;padding:4px 6px;border-radius:6px}
+.thumb-wrap{position:relative;flex:0 0 auto}
+.thumb-wrap .thumb{display:block;width:100%}
+.thumb-wrap.dragging{opacity:.5}
+.thumb-wrap.dragging .thumb{box-shadow:0 0 0 3px var(--sel)}
+.thumb-wrap .num{position:absolute;left:5px;top:5px;z-index:3;background:var(--surface);color:var(--ink);font-size:11px;line-height:1;padding:5px 7px;border-radius:7px;display:inline-flex;align-items:center;gap:3px;cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.thumb-wrap .num svg{width:9px;height:12px;fill:currentColor;opacity:.6}
+.th-x{position:absolute;top:4px;right:4px;z-index:3;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:15px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.th-x:hover{color:var(--danger);border-color:var(--danger)}
+.check-row{display:flex;align-items:center;gap:10px;font-size:14px;cursor:pointer}
+.check-row input{width:20px;height:20px;accent-color:var(--accent)}
+.toast-act{margin-left:12px;background:none;border:0;color:inherit;font:inherit;font-weight:600;text-decoration:underline;cursor:pointer;padding:4px 2px}
+.ph-draft{position:absolute;top:8px;left:8px;z-index:1;background:var(--surface);color:var(--ink);border:1px solid var(--line);font-size:12px;line-height:1;padding:5px 9px;border-radius:999px}
 .add-slide{border:1px dashed var(--line);background:none;border-radius:10px;padding:12px 6px;cursor:pointer;color:var(--muted);font-size:13px;flex:0 0 auto}
 .add-slide:hover{border-color:var(--accent);color:var(--ink)}
 .stage{display:flex;flex-direction:column;gap:12px;align-items:center;min-width:0}
@@ -148,7 +171,10 @@ main:focus{outline:none}
 /* ---------- photos ---------- */
 .ph-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:16px}
 .ph-tile{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
-.ph-tile.is-used .ph-img{opacity:.8}
+.ph-img{position:relative}
+.ph-tile.is-used .ph-img{filter:grayscale(1)}
+.ph-tile.is-used .ph-img::after,.picker button.is-used::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent calc(50% - 2px),rgba(30,26,23,.9) calc(50% - 2px),rgba(30,26,23,.9) calc(50% + 2px),transparent calc(50% + 2px))}
+.picker button.is-used{filter:grayscale(1)}
 .ph-used{position:absolute;top:8px;left:8px;z-index:1;background:var(--ink);color:var(--bg);font-size:12px;line-height:1;padding:6px 10px;border-radius:999px}
 .ph-move{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:6px 10px;font-size:13px;max-width:100%}
 .ph-sub{color:var(--muted);font-size:14px;margin:-8px 0 18px}
@@ -229,7 +255,10 @@ dialog .row.end{justify-content:flex-end;margin-top:6px}
   .nav button{min-height:48px}
   .stepper button{width:40px;height:40px}
   .field input[type=text],.field input[type=url],.field input[type=date],.field select,.field textarea,.pill-input,.stepper input,.color input[type=text]{font-size:16px}
-  .thumb .num{font-size:13px}
+  .thumb-wrap .num{font-size:13px;padding:8px 10px}
+  .th-x{width:32px;height:32px;font-size:18px}
+  .th-dup{width:32px;height:32px;top:42px}
+  .th-dup svg{width:15px;height:15px}
 }
 
 /* ---------- responsive ---------- */
@@ -268,6 +297,7 @@ dialog .row.end{justify-content:flex-end;margin-top:6px}
 .slide{position:relative;width:1080px;height:1350px;overflow:hidden;display:flex;align-items:center;justify-content:center;text-align:center;font-family:var(--b-body);color:var(--b-ink);background:var(--b-bg)}
 .slide.fmt-story{height:1920px}
 .slide.bg-sand{background:var(--b-bg)}
+.slide.bg-sage{background:var(--b-sage,#DDE7DC)}
 .slide.bg-white{background:var(--b-card)}
 .slide.bg-taupe{background:var(--b-accent);color:var(--b-card)}
 .slide.bg-ink{background:var(--b-ink);color:var(--b-card)}
@@ -278,38 +308,66 @@ dialog .row.end{justify-content:flex-end;margin-top:6px}
 .slide.fmt-story .panel{padding:300px 110px 400px}
 .slide.bg-photo .panel,.slide.fmt-story.bg-photo .panel{width:auto;max-width:860px;margin:0 110px;padding:84px 76px 64px;background:var(--b-card);color:var(--b-ink);border-radius:44px;box-shadow:0 34px 90px rgba(30,24,18,.22);gap:28px}
 .slide .h{font-family:var(--b-display);font-weight:500;line-height:1.04;letter-spacing:-.012em;margin:0;text-wrap:balance}
+.slide.lay-cta .h{font-family:var(--b-tips);font-weight:400;letter-spacing:0;line-height:1.1}
 .slide .acc{font-family:var(--b-script);font-style:italic;font-weight:400;line-height:1.15;margin:-6px 0 0;text-wrap:balance;opacity:.92}
 .slide .acc.script{font-style:normal}
 .slide .body{font-size:38px;line-height:1.45;font-weight:400;margin:0;max-width:800px;text-wrap:balance;opacity:.86}
 .slide .rule{width:120px;height:2px;background:currentColor;opacity:.35;flex:0 0 auto}
-.slide .pill{display:inline-block;padding:22px 52px;border-radius:60px;background:var(--b-accent);color:var(--b-card);font-size:30px;font-weight:500;letter-spacing:.02em}
+.slide .pill{display:inline-block;padding:22px 52px;border-radius:60px;background:var(--b-accent);color:var(--b-card);font-size:33px;font-weight:500;letter-spacing:.02em}
 .slide.bg-taupe .pill,.slide.bg-ink .pill{background:var(--b-card);color:var(--b-ink)}
 .slide .items{display:flex;flex-direction:column;gap:20px;width:100%;max-width:820px}
-.slide .item{background:var(--b-card);color:var(--b-ink);border-radius:60px;padding:24px 44px;font-size:34px;line-height:1.3;text-wrap:balance;box-shadow:0 8px 24px rgba(30,24,18,.06)}
+.slide .item{background:var(--b-card);color:var(--b-ink);border-radius:60px;padding:26px 46px;font-size:40px;line-height:1.3;text-wrap:balance;box-shadow:0 8px 24px rgba(30,24,18,.06)}
 .slide.bg-white .item,.slide.bg-photo .item{background:var(--b-soft);box-shadow:none}
 .slide .steps{display:flex;flex-direction:column;gap:30px;width:100%;max-width:820px;margin:0;padding:0;list-style:none}
 .slide .steps li{display:flex;flex-direction:column;align-items:center;gap:12px;font-size:34px;line-height:1.3;text-wrap:balance}
-.slide .steps .n{width:64px;height:64px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:var(--b-display);font-size:30px;opacity:.85}
+.slide .steps .n{width:64px;height:64px;border-radius:50%;border:2px solid currentColor;display:flex;align-items:center;justify-content:center;font-family:var(--b-display);font-size:33px;opacity:.85}
 .slide .big{font-family:var(--b-display);font-weight:500;line-height:.95;letter-spacing:-.02em;margin:0}
 .slide .mf{display:flex;flex-direction:column;gap:24px;width:100%;max-width:820px}
 .slide .mf .card{border-radius:36px;padding:38px 48px;display:flex;flex-direction:column;gap:12px;align-items:center}
 .slide .mf .card.myth{background:transparent;border:2px solid currentColor;opacity:.75}
 .slide .mf .card.fact{background:var(--b-card);color:var(--b-ink)}
 .slide.bg-white .mf .card.fact,.slide.bg-photo .mf .card.fact{background:var(--b-soft)}
-.slide .mf .lbl{font-family:var(--b-script);font-style:italic;font-size:40px}
+.slide .mf .lbl{font-family:var(--b-script);font-style:italic;font-size:48px}
 .slide .mf .lbl.script{font-style:normal}
-.slide .mf .txt{font-size:36px;line-height:1.35;text-wrap:balance}
+.slide .mf .txt{font-size:45px;line-height:1.35;text-wrap:balance}
 .slide .headshot{width:280px;height:280px;border-radius:50%;background:var(--b-soft) center/cover no-repeat;border:10px solid var(--b-card);box-shadow:0 16px 40px rgba(30,24,18,.16);flex:0 0 auto}
-.slide .sig{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:28px;line-height:1.4}
-.slide .sig b{font-family:var(--b-display);font-weight:500;font-size:36px}
+.slide .sig{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:35px;line-height:1.4}
+.slide .sig b{font-family:var(--b-display);font-weight:500;font-size:40px}
 .slide .sig span{opacity:.8}
-.slide .foot{position:absolute;left:0;right:0;bottom:58px;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:24px;letter-spacing:.06em;padding:0 120px}
+.slide .foot{position:absolute;left:0;right:0;bottom:58px;z-index:1;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:31px;letter-spacing:.06em;padding:0 120px}
 .slide.fmt-story .foot{bottom:300px}
 .slide .foot span{opacity:.72}
-.slide .foot .fn{letter-spacing:0;font-size:22px;text-wrap:balance;opacity:.65}
-.slide .foot-in{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:22px;letter-spacing:.05em;margin-top:6px}
+.slide .foot .fn{letter-spacing:0;font-size:30px;text-wrap:balance;opacity:.65}
+.slide .foot-in{display:flex;flex-direction:column;align-items:center;gap:8px;font-size:29px;letter-spacing:.05em;margin-top:6px}
 .slide .foot-in span{opacity:.65}
-.slide .foot-in .fn{letter-spacing:0;font-size:20px;text-wrap:balance}
+.slide .foot-in .fn{letter-spacing:0;font-size:27px;text-wrap:balance}
+.slide .qmark{font-family:var(--b-display);font-size:300px;line-height:1;height:170px;overflow:hidden;color:var(--b-accent);margin-bottom:-30px}
+.slide.bg-taupe .qmark,.slide.bg-ink .qmark{color:var(--b-card)}
+.slide .h.quote-text{font-style:italic;font-weight:400;line-height:1.15}
+.slide .checks{display:flex;flex-direction:column;gap:26px;width:100%;max-width:840px;align-items:center}
+.slide .check{display:flex;align-items:center;gap:24px;font-size:46px;line-height:1.3;text-align:left;text-wrap:balance}
+.slide .check .ck{flex:0 0 auto;width:62px;height:62px;border-radius:50%;background:var(--b-accent);color:var(--b-card);display:flex;align-items:center;justify-content:center;font-size:34px;line-height:1}
+.slide.bg-taupe .check .ck,.slide.bg-ink .check .ck{background:var(--b-card);color:var(--b-ink)}
+.slide .cmp{display:flex;gap:28px;width:100%;max-width:900px;align-items:stretch}
+.slide .cmp-col{flex:1 1 0;min-width:0;border-radius:36px;padding:40px 30px;display:flex;flex-direction:column;gap:20px;align-items:center}
+.slide .cmp-col.do{background:var(--b-card);color:var(--b-ink)}
+.slide.bg-white .cmp-col.do,.slide.bg-photo .cmp-col.do{background:var(--b-soft)}
+.slide .cmp-col.dont{border:3px solid currentColor}
+.slide .cmp-t{font-family:var(--b-display);font-size:54px;line-height:1.1;display:flex;align-items:center;gap:14px;text-align:left}
+.slide .cmp-t .ic{width:52px;height:52px;border-radius:50%;background:var(--b-accent);color:var(--b-card);font-family:var(--b-body);font-size:32px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;width:58px;height:58px}
+.slide .cmp-col.dont .cmp-t .ic{background:transparent;border:3px solid currentColor;color:inherit}
+.slide .cmp-i{font-size:46px;line-height:1.3;text-wrap:balance}
+.slide.bg-photo.lay-compare .panel{width:calc(100% - 80px);max-width:1000px;margin:0 40px;padding:72px 44px 60px}
+.slide.bg-photo.lay-compare .cmp{gap:22px}
+.slide.bg-photo.lay-compare .cmp-col{padding:38px 24px}
+.slide .tint{position:absolute;inset:0;background:var(--b-tint,#B7CFBA);opacity:var(--b-tint-o,.16);pointer-events:none}
+.slide.lay-split .tint{top:54%}
+.slide.bg-ink .tint,.slide.bg-taupe .tint{opacity:calc(var(--b-tint-o,.16) * .6)}
+.slide .tag{display:inline-block;border:3px solid currentColor;border-radius:60px;padding:14px 38px;font-size:35px;letter-spacing:.06em}
+.slide.lay-split{flex-direction:column;justify-content:flex-start}
+.slide .split-ph{width:100%;height:54%;flex:0 0 auto;background:var(--b-soft) center/cover no-repeat}
+.slide.lay-split .panel{flex:1 1 auto;padding:60px 100px 130px;gap:24px}
+.slide.fmt-story.lay-split .panel{padding:70px 100px 380px}
 .slide .al-left{align-self:flex-start;text-align:left;align-items:flex-start}
 .slide .al-right{align-self:flex-end;text-align:right;align-items:flex-end}
 .slide .al-center{align-self:center;text-align:center;align-items:center}
@@ -323,8 +381,8 @@ dialog .row.end{justify-content:flex-end;margin-top:6px}
 </style>
 </head>
 <body>
-<script type="application/json" id="starter-ideas">[{"id": "i01-fhsa", "order": 1, "status": "scripted", "timely": "Post before Dec 31", "verifiedOn": "2026-11-06", "title": "Open an FHSA before December 31", "hook": "If buying in the next few years is on your radar, do this before New Year’s.", "facts": ["FHSA contribution room only starts building once the account is open, not from when you became eligible.", "You can contribute $8,000 a year, up to $40,000 over your lifetime.", "Unused room carries forward up to $8,000, so the most you can contribute in one year is $16,000.", "The contribution deadline is December 31. Unlike RRSPs, there is no 60-day grace period.", "Contributions are tax-deductible, and qualifying withdrawals for a first home are tax-free with no repayment.", "You must qualify as a first-time home buyer to open one."], "sources": [{"label": "H&R Block: maximizing your FHSA", "url": "https://www.hrblock.ca/blog/how-to-maximize-your-first-home-savings-account-fhsa-tax-deduction"}, {"label": "Sun Life: FHSA benefits", "url": "https://www.sunlife.ca/en/investments/fhsa/benefits-of-fhsas/"}], "notes": "Reel script written Nov 4. Federal budget coverage checked Nov 6: no FHSA changes reported.", "footnote": "Confirm your eligibility with your bank or financial advisor.", "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i02-hst", "order": 2, "status": "scripted", "timely": "Deadline Mar 31, 2027", "verifiedOn": "2026-11-04", "title": "Up to $130K back on a brand-new home", "hook": "Ontario is basically refunding the HST on new homes, and the clock is ticking.", "facts": ["Agreements signed with a builder between April 1, 2026 and March 31, 2027 may recover up to $130,000 of the 13% HST on a new home.", "It is open to all eligible buyers, not only first-time buyers.", "Full HST relief on homes up to $1 million; a $130,000 maximum between $1 million and $1.5 million; it phases down to $1.85 million; above that, only the existing $24,000 rebate.", "The home must be your primary residence.", "Resale homes do not qualify."], "sources": [{"label": "CRA Notice 346", "url": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/notice346/ontario-enhanced-new-housing-rebate.html"}, {"label": "TRREB: Ontario Enhanced New Housing Rebate", "url": "https://trreb.ca/ontario-enhanced-new-housing-rebate/"}], "notes": "Reel script written Nov 4.", "footnote": "Ask your lawyer how the rebate shows up in your price.", "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i03-rates", "order": 3, "status": "scripted", "timely": "Post before Dec 9", "verifiedOn": "2026-11-04", "title": "Rates just went up. Now what?", "hook": "First rate hike in over three years. Here’s what buyers need to know.", "facts": ["On October 28, 2026 the Bank of Canada raised its policy rate by 0.25 points to 2.5%, its first increase since July 2023.", "The Bank said the hike aims to keep high fuel prices from spreading into broader inflation, which is at 3.1%.", "The Bank said further increases could be needed, but it will proceed carefully.", "The next rate announcement is December 9, 2026."], "sources": [{"label": "CP24: Bank of Canada raises rate", "url": "https://www.cp24.com/news/canada/2026/10/28/bank-of-canada-raises-interest-rate-as-inflation-projected-to-worsen/"}, {"label": "Bank of Canada: Oct 28 announcement", "url": "https://www.bankofcanada.ca/2026/10/fad-announcement-release-mpr-2026-10-28/"}], "notes": "Reel script written Nov 4. Keep it explanatory, no predictions.", "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i04-market", "order": 4, "status": "research", "timely": "Monthly series", "verifiedOn": "2026-11-04", "title": "GTA market update: October 2026", "hook": "Prices, sales, listings: here’s what actually happened in the GTA last month.", "facts": ["TRREB reported 5,603 GTA sales in October 2026, down 7.9% year over year, but up 1.2% from September on a seasonally adjusted basis.", "The average selling price was $1,024,108, down 2.7% year over year. The benchmark price was down 4.3%.", "New listings fell 11.9% from last year.", "Active listings were down 10%, with 25,098 homes for sale."], "sources": [{"label": "Global News / Canadian Press, Nov 4", "url": "https://globalnews.ca/news/12136224/toronto-area-home-sales-october-2026/"}], "notes": "TRREB releases new stats early each month. Refresh the numbers before each post.", "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i05-cooling", "order": 5, "status": "research", "timely": "Starts Jan 1, 2027", "verifiedOn": "2026-11-04", "title": "New freehold homes get a cooling-off period in 2027", "hook": "New-build buyers get a brand-new right in 2027.", "facts": ["New condos already have a 10-day cooling-off period under the Condominium Act.", "A 10-day cooling-off period for new freehold homes (detached, semi, freehold townhouse) applies to agreements signed on or after January 1, 2027.", "Resale homes and resale condos have no automatic right to cancel once the deal is firm.", "Since January 1, 2026, new freehold buyers who notify Tarion within 45 days of signing qualify for maximum deposit coverage."], "sources": [{"label": "O. Reg. 290/26 (Ontario e-Laws)", "url": "https://www.ontario.ca/laws/regulation/r26290"}, {"label": "Tarion: notify within 45 days", "url": "https://www.tarion.com/node/66121"}, {"label": "Tarion: condo cooling-off", "url": "https://www.tarion.com/node/754"}], "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i06-ltt", "order": 6, "status": "research", "timely": "", "verifiedOn": "2026-11-04", "title": "In Toronto, you pay land transfer tax twice", "hook": "Buying in the 416? Budget for this before you fall in love with a listing.", "facts": ["Toronto charges its own municipal land transfer tax on top of Ontario’s, with nearly the same rates up to $2 million.", "First-time buyers can get up to $4,000 back on the Ontario tax and up to $4,475 on the Toronto tax, a combined maximum of $8,475.", "To qualify: be at least 18, never have owned a home or an interest in one anywhere in the world, and move in within nine months.", "The Ontario refund is limited to Canadian citizens and permanent residents."], "sources": [{"label": "Ontario: LTT refunds for first-time buyers", "url": "https://ontario.ca/document/land-transfer-tax/land-transfer-tax-refunds-first-time-homebuyers"}, {"label": "TRREB: LTT rebates", "url": "https://trreb.ca/wp-content/files/homeownership/LTT-Tax-Rebates.pdf"}], "notes": "Mayor Chow was re-elected Oct 26, so the proposed Toronto LTT cut is off the table.", "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i07-ftb", "order": 7, "status": "research", "timely": "", "verifiedOn": "2026-11-04", "title": "You might still be a “first-time buyer”", "hook": "Owned a place years ago? You might still qualify for these programs.", "facts": ["For federal programs like the Home Buyers’ Plan, you count as a first-time buyer if you haven’t lived in a home you or your current spouse owned in the last four years.", "Ontario’s land transfer tax refund is stricter: any past ownership anywhere in the world disqualifies you, including a home you were gifted or inherited."], "sources": [{"label": "Ontario: LTT refund eligibility", "url": "https://ontario.ca/document/land-transfer-tax/land-transfer-tax-refunds-first-time-homebuyers"}, {"label": "MoneySense: FHSA and first-time buyer rules", "url": "https://www.moneysense.ca/columns/ask-a-planner/can-i-still-use-my-fhsa-after-my-spouse-bought-a-condo/"}], "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i08-stack", "order": 8, "status": "research", "timely": "", "verifiedOn": "2026-11-04", "title": "The couple stack: FHSA plus the Home Buyers’ Plan", "hook": "How a couple could put up to $200K toward a down payment, tax-advantaged.", "facts": ["The Home Buyers’ Plan lets each first-time buyer withdraw $60,000 from their RRSP, or $120,000 for a qualifying couple.", "HBP withdrawals are repaid over 15 years, for example $4,000 a year on $60,000.", "The FHSA and HBP can be used together for the same home: up to $100,000 per person or $200,000 per couple."], "sources": [{"label": "Canadian Money Help: HBP 2026", "url": "https://canadianmoneyhelp.ca/?p=360"}, {"label": "FHSA 2026 guide", "url": "https://silaws.com/first-home-savings-account-fhsa-canada-2026-en/"}], "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i09-down", "order": 9, "status": "research", "timely": "", "verifiedOn": "2026-11-04", "title": "Minimum down payment math (it’s not 20%)", "hook": "What’s the minimum down payment on a $1M home? Most people guess wrong.", "facts": ["The minimum is 5% on the first $500,000 and 10% on the portion between $500,000 and $1.5 million.", "On a $1 million home, that’s $75,000.", "At or above $1.5 million you need at least 20% down, and the mortgage can’t be insured.", "First-time buyers may qualify for a 30-year amortization on an insured purchase, new or resale."], "sources": [{"label": "CMHC rules 2026 overview", "url": "https://pegasuslending.com/blog/cmhc-mortgage-rules-2026-canada/"}, {"label": "Down payment changes coverage", "url": "https://nsnews.com/highlights/new-mortgage-rules-will-significantly-lower-down-payments-on-properties-costing-1m-or-more-guidance-shows-9568328"}], "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i10-bra", "order": 10, "status": "research", "timely": "", "verifiedOn": "2026-11-04", "title": "Read your buyer representation agreement first", "hook": "Your agent will ask you to sign this. Here’s what to check first.", "facts": ["A brokerage must sign a written buyer representation agreement with you before providing client-level services.", "Check the brokerage name, the term, the geographic area, property types, commission, and the holdover clause.", "In April 2026, RECO referred an agent to a discipline hearing over allegations that included falsifying a buyer agreement.", "RECO says holdover clauses aren’t required but are a frequent source of complaints."], "sources": [{"label": "Buyer rights under TRESA (checklist)", "url": "https://www.filipesells.ca/downloads/buyer-rights-tresa-checklist.pdf"}, {"label": "Money.ca: RECO discipline and BRAs", "url": "https://money.ca/mortgages/homebuying/ontario-buyer-representation-agreement-holdover-clause-reco-discipline"}], "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i11-vht", "order": 11, "status": "research", "timely": "Portal opens in November", "verifiedOn": "2026-11-04", "title": "The yearly declaration new Toronto owners can’t skip", "hook": "You live in your home. You can still get hit with a 3% tax if you miss this.", "facts": ["Every Toronto residential owner must declare occupancy each year, even if the home is occupied.", "Miss the deadline and the City automatically treats the property as vacant.", "The Vacant Home Tax is 3% of the property’s assessed value.", "The declaration portal opens each November. Last year’s deadline was April 30."], "sources": [{"label": "City of Toronto: tax and utilities answers", "url": "https://www.toronto.ca/services-payments/property-taxes-utilities/tax-and-utilities-answers"}, {"label": "WOWA: Vacant Home Tax", "url": "https://wowa.ca/toronto-vacant-home-tax"}], "notes": "Confirm the official deadline for the 2026 declaration with the City before posting.", "createdAt": "2026-11-06T22:00:00Z"}, {"id": "i12-budget", "order": 12, "status": "research", "timely": "Proposed, not law yet", "verifiedOn": "2026-11-06", "title": "Budget 2026: what it could mean for buyers", "hook": "The federal budget just dropped. Here’s what matters if you’re buying.", "facts": ["Budget 2026 was tabled on November 5, 2026.", "Ottawa proposes raising the price ceiling for optional mortgage insurance on buyers with 20% down from $1 million to $1.5 million. No start date has been confirmed.", "The foreign buyer ban on existing homes is proposed to extend to January 1, 2029, with new residential properties exempted.", "These are proposals, not law yet."], "sources": [{"label": "Canadian Mortgage Professional, Nov 6", "url": "https://www.mpamag.com/ca/mortgage-industry/industry-trends/budget-2026-the-biggest-housing-announcements-for-brokers/596507"}, {"label": "Bloomberg, Nov 5", "url": "https://www.bloomberg.com/news/articles/2026-11-05/canada-budget-2026-carney-relaxes-foreign-buyer-ban-adds-billions-for-housing"}], "notes": "Re-check status before posting; details may change as the budget moves through Parliament.", "createdAt": "2026-11-06T22:00:00Z"}]</script>
-<script type="application/json" id="starter-photos">[{"id": "p01", "file": "library-01.jpg", "name": "Living room with lounge chairs", "category": "interior", "order": 1}, {"id": "p02", "file": "library-02.jpg", "name": "Dining room with fireplace", "category": "interior", "order": 2}, {"id": "p03", "file": "library-03.jpg", "name": "Cozy reading nook", "category": "interior", "order": 3}, {"id": "p04", "file": "library-04.jpg", "name": "Sunroom dining nook", "category": "interior", "order": 4}, {"id": "p05", "file": "library-05.jpg", "name": "Bright living room with fireplace", "category": "interior", "order": 5}, {"id": "p06", "file": "library-06.jpg", "name": "Beamed living room", "category": "interior", "order": 6}, {"id": "p07", "file": "library-07.jpg", "name": "Couch and armchair by window", "category": "interior", "order": 7}, {"id": "p08", "file": "library-08.jpg", "name": "Shelves and sofa", "category": "interior", "order": 8}, {"id": "p09", "file": "library-09.jpg", "name": "Soft-focus leaf", "category": "nature", "order": 9}, {"id": "p10", "file": "library-10.jpg", "name": "Cotton stems and cabinet", "category": "interior", "order": 10}, {"id": "p11", "file": "library-11.jpg", "name": "Black and white building", "category": "abstract", "order": 11}, {"id": "p12", "file": "library-12.jpg", "name": "Open-concept kitchen and dining", "category": "interior", "order": 12}, {"id": "p13", "file": "library-13.jpg", "name": "Armchair with HOME sign", "category": "interior", "order": 13}, {"id": "p14", "file": "library-14.jpg", "name": "Marble wall and egg chair", "category": "interior", "order": 14}, {"id": "p15", "file": "library-15.jpg", "name": "Living room with staircase", "category": "interior", "order": 15}, {"id": "p16", "file": "library-16.jpg", "name": "Living room with ceiling fan", "category": "interior", "order": 16}, {"id": "p17", "file": "library-17.jpg", "name": "Classic fireplace living room", "category": "interior", "order": 17}, {"id": "p18", "file": "library-18.jpg", "name": "Warm living room with painting", "category": "interior", "order": 18}, {"id": "p19", "file": "library-19.jpg", "name": "Leather chair and desk", "category": "interior", "order": 19}, {"id": "p20", "file": "library-20.jpg", "name": "Soft grey living room", "category": "interior", "order": 20}, {"id": "p21", "file": "library-21.jpg", "name": "Armchair on concrete wall", "category": "interior", "order": 21}, {"id": "p22", "file": "library-22.jpg", "name": "Dried flowers and candle", "category": "interior", "order": 22}, {"id": "p23", "file": "library-23.jpg", "name": "Simple living room", "category": "interior", "order": 23}, {"id": "p24", "file": "library-24.jpg", "name": "White fireplace living room", "category": "interior", "order": 24}, {"id": "p25", "file": "library-25.jpg", "name": "Sage green wall and sofa", "category": "interior", "order": 25}, {"id": "p26", "file": "library-26.jpg", "name": "Orange accent living room", "category": "interior", "order": 26}, {"id": "p27", "file": "library-27.jpg", "name": "Mustard wall living room", "category": "interior", "order": 27}, {"id": "p28", "file": "library-28.jpg", "name": "Round window cafe", "category": "interior", "order": 28}, {"id": "p29", "file": "library-29.jpg", "name": "Little white houses", "category": "abstract", "order": 29}, {"id": "p30", "file": "library-30.jpg", "name": "Wooden house models", "category": "abstract", "order": 30}]</script>
+<script type="application/json" id="starter-ideas">[{"createdAt": "2026-11-06T22:00:00Z", "facts": ["FHSA contribution room only starts building once the account is open, not from when you became eligible.", "You can contribute $8,000 a year, up to $40,000 over your lifetime.", "Unused room carries forward up to $8,000, so the most you can contribute in one year is $16,000.", "The contribution deadline is December 31. Unlike RRSPs, there is no 60-day grace period.", "Contributions are tax-deductible, and qualifying withdrawals for a first home are tax-free with no repayment.", "You must qualify as a first-time home buyer to open one."], "footnote": "Confirm your eligibility with your bank or financial advisor.", "hook": "If buying in the next few years is on your radar, do this before New Year’s.", "notes": "Reel script written Nov 4. Federal budget coverage checked Nov 6: no FHSA changes reported.", "order": 1, "sources": [{"label": "H&R Block: maximizing your FHSA", "url": "https://www.hrblock.ca/blog/how-to-maximize-your-first-home-savings-account-fhsa-tax-deduction"}, {"label": "Sun Life: FHSA benefits", "url": "https://www.sunlife.ca/en/investments/fhsa/benefits-of-fhsas/"}], "status": "designed", "timely": "Post before Dec 31", "title": "Open an FHSA before December 31", "verifiedOn": "2026-11-06", "id": "i01-fhsa"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["Agreements signed with a builder between April 1, 2026 and March 31, 2027 may recover up to $130,000 of the 13% HST on a new home.", "It is open to all eligible buyers, not only first-time buyers.", "Full HST relief on homes up to $1 million; a $130,000 maximum between $1 million and $1.5 million; it phases down to $1.85 million; above that, only the existing $24,000 rebate.", "The home must be your primary residence.", "Resale homes do not qualify."], "footnote": "Ask your lawyer how the rebate shows up in your price.", "hook": "Ontario is basically refunding the HST on new homes, and the clock is ticking.", "notes": "Reel script written Nov 4.", "order": 2, "sources": [{"label": "CRA Notice 346", "url": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/notice346/ontario-enhanced-new-housing-rebate.html"}, {"label": "TRREB: Ontario Enhanced New Housing Rebate", "url": "https://trreb.ca/ontario-enhanced-new-housing-rebate/"}], "status": "scripted", "timely": "Deadline Mar 31, 2027", "title": "Up to $130K back on a brand-new home", "verifiedOn": "2026-11-04", "id": "i02-hst"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["On October 28, 2026 the Bank of Canada raised its policy rate by 0.25 points to 2.5%, its first increase since July 2023.", "The Bank said the hike aims to keep high fuel prices from spreading into broader inflation, which is at 3.1%.", "The Bank said further increases could be needed, but it will proceed carefully.", "The next rate announcement is December 9, 2026."], "hook": "First rate hike in over three years. Here’s what buyers need to know.", "notes": "Reel script written Nov 4. Keep it explanatory, no predictions.", "order": 3, "sources": [{"label": "CP24: Bank of Canada raises rate", "url": "https://www.cp24.com/news/canada/2026/10/28/bank-of-canada-raises-interest-rate-as-inflation-projected-to-worsen/"}, {"label": "Bank of Canada: Oct 28 announcement", "url": "https://www.bankofcanada.ca/2026/10/fad-announcement-release-mpr-2026-10-28/"}], "status": "scripted", "timely": "Post before Dec 9", "title": "Rates just went up. Now what?", "verifiedOn": "2026-11-04", "id": "i03-rates"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["TRREB reported 5,603 GTA sales in October 2026, down 7.9% year over year, but up 1.2% from September on a seasonally adjusted basis.", "The average selling price was $1,024,108, down 2.7% year over year. The benchmark price was down 4.3%.", "New listings fell 11.9% from last year.", "Active listings were down 10%, with 25,098 homes for sale."], "hook": "Prices, sales, listings: here’s what actually happened in the GTA last month.", "notes": "TRREB releases new stats early each month. Refresh the numbers before each post.", "order": 4, "sources": [{"label": "Global News / Canadian Press, Nov 4", "url": "https://globalnews.ca/news/12136224/toronto-area-home-sales-october-2026/"}], "status": "research", "timely": "Monthly series", "title": "GTA market update: October 2026", "verifiedOn": "2026-11-04", "id": "i04-market"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["New condos already have a 10-day cooling-off period under the Condominium Act.", "A 10-day cooling-off period for new freehold homes (detached, semi, freehold townhouse) applies to agreements signed on or after January 1, 2027.", "Resale homes and resale condos have no automatic right to cancel once the deal is firm.", "Since January 1, 2026, new freehold buyers who notify Tarion within 45 days of signing qualify for maximum deposit coverage."], "hook": "New-build buyers get a brand-new right in 2027.", "order": 5, "sources": [{"label": "O. Reg. 290/26 (Ontario e-Laws)", "url": "https://www.ontario.ca/laws/regulation/r26290"}, {"label": "Tarion: notify within 45 days", "url": "https://www.tarion.com/node/66121"}, {"label": "Tarion: condo cooling-off", "url": "https://www.tarion.com/node/754"}], "status": "research", "timely": "Starts Jan 1, 2027", "title": "New freehold homes get a cooling-off period in 2027", "verifiedOn": "2026-11-04", "id": "i05-cooling"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["Toronto charges its own municipal land transfer tax on top of Ontario’s, with nearly the same rates up to $2 million.", "First-time buyers can get up to $4,000 back on the Ontario tax and up to $4,475 on the Toronto tax, a combined maximum of $8,475.", "To qualify: be at least 18, never have owned a home or an interest in one anywhere in the world, and move in within nine months.", "The Ontario refund is limited to Canadian citizens and permanent residents."], "hook": "Buying in the 416? Budget for this before you fall in love with a listing.", "notes": "Mayor Chow was re-elected Oct 26, so the proposed Toronto LTT cut is off the table.", "order": 6, "sources": [{"label": "Ontario: LTT refunds for first-time buyers", "url": "https://ontario.ca/document/land-transfer-tax/land-transfer-tax-refunds-first-time-homebuyers"}, {"label": "TRREB: LTT rebates", "url": "https://trreb.ca/wp-content/files/homeownership/LTT-Tax-Rebates.pdf"}], "status": "research", "timely": "", "title": "In Toronto, you pay land transfer tax twice", "verifiedOn": "2026-11-04", "id": "i06-ltt"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["For federal programs like the Home Buyers’ Plan, you count as a first-time buyer if you haven’t lived in a home you or your current spouse owned in the last four years.", "Ontario’s land transfer tax refund is stricter: any past ownership anywhere in the world disqualifies you, including a home you were gifted or inherited."], "hook": "Owned a place years ago? You might still qualify for these programs.", "order": 7, "sources": [{"label": "Ontario: LTT refund eligibility", "url": "https://ontario.ca/document/land-transfer-tax/land-transfer-tax-refunds-first-time-homebuyers"}, {"label": "MoneySense: FHSA and first-time buyer rules", "url": "https://www.moneysense.ca/columns/ask-a-planner/can-i-still-use-my-fhsa-after-my-spouse-bought-a-condo/"}], "status": "research", "timely": "", "title": "You might still be a “first-time buyer”", "verifiedOn": "2026-11-04", "id": "i07-ftb"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["The Home Buyers’ Plan lets each first-time buyer withdraw $60,000 from their RRSP, or $120,000 for a qualifying couple.", "HBP withdrawals are repaid over 15 years, for example $4,000 a year on $60,000.", "The FHSA and HBP can be used together for the same home: up to $100,000 per person or $200,000 per couple."], "hook": "How a couple could put up to $200K toward a down payment, tax-advantaged.", "order": 8, "sources": [{"label": "Canadian Money Help: HBP 2026", "url": "https://canadianmoneyhelp.ca/?p=360"}, {"label": "FHSA 2026 guide", "url": "https://silaws.com/first-home-savings-account-fhsa-canada-2026-en/"}], "status": "research", "timely": "", "title": "The couple stack: FHSA plus the Home Buyers’ Plan", "verifiedOn": "2026-11-04", "id": "i08-stack"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["The minimum is 5% on the first $500,000 and 10% on the portion between $500,000 and $1.5 million.", "On a $1 million home, that’s $75,000.", "At or above $1.5 million you need at least 20% down, and the mortgage can’t be insured.", "First-time buyers may qualify for a 30-year amortization on an insured purchase, new or resale."], "hook": "What’s the minimum down payment on a $1M home? Most people guess wrong.", "order": 9, "sources": [{"label": "CMHC rules 2026 overview", "url": "https://pegasuslending.com/blog/cmhc-mortgage-rules-2026-canada/"}, {"label": "Down payment changes coverage", "url": "https://nsnews.com/highlights/new-mortgage-rules-will-significantly-lower-down-payments-on-properties-costing-1m-or-more-guidance-shows-9568328"}], "status": "research", "timely": "", "title": "Minimum down payment math (it’s not 20%)", "verifiedOn": "2026-11-04", "id": "i09-down"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["A brokerage must sign a written buyer representation agreement with you before providing client-level services.", "Check the brokerage name, the term, the geographic area, property types, commission, and the holdover clause.", "In April 2026, RECO referred an agent to a discipline hearing over allegations that included falsifying a buyer agreement.", "RECO says holdover clauses aren’t required but are a frequent source of complaints."], "hook": "Your agent will ask you to sign this. Here’s what to check first.", "order": 10, "sources": [{"label": "Buyer rights under TRESA (checklist)", "url": "https://www.filipesells.ca/downloads/buyer-rights-tresa-checklist.pdf"}, {"label": "Money.ca: RECO discipline and BRAs", "url": "https://money.ca/mortgages/homebuying/ontario-buyer-representation-agreement-holdover-clause-reco-discipline"}], "status": "research", "timely": "", "title": "Read your buyer representation agreement first", "verifiedOn": "2026-11-04", "id": "i10-bra"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["Every Toronto residential owner must declare occupancy each year, even if the home is occupied.", "Miss the deadline and the City automatically treats the property as vacant.", "The Vacant Home Tax is 3% of the property’s assessed value.", "The declaration portal opens each November. Last year’s deadline was April 30."], "hook": "You live in your home. You can still get hit with a 3% tax if you miss this.", "notes": "Confirm the official deadline for the 2026 declaration with the City before posting.", "order": 11, "sources": [{"label": "City of Toronto: tax and utilities answers", "url": "https://www.toronto.ca/services-payments/property-taxes-utilities/tax-and-utilities-answers"}, {"label": "WOWA: Vacant Home Tax", "url": "https://wowa.ca/toronto-vacant-home-tax"}], "status": "designed", "timely": "Portal opens in November", "title": "The yearly declaration new Toronto owners can’t skip", "verifiedOn": "2026-11-04", "id": "i11-vht"}, {"createdAt": "2026-11-06T22:00:00Z", "facts": ["Budget 2026 was tabled on November 5, 2026.", "Ottawa proposes raising the price ceiling for optional mortgage insurance on buyers with 20% down from $1 million to $1.5 million. No start date has been confirmed.", "The foreign buyer ban on existing homes is proposed to extend to January 1, 2029, with new residential properties exempted.", "These are proposals, not law yet."], "hook": "The federal budget just dropped. Here’s what matters if you’re buying.", "notes": "Re-check status before posting; details may change as the budget moves through Parliament.", "order": 12, "sources": [{"label": "Canadian Mortgage Professional, Nov 6", "url": "https://www.mpamag.com/ca/mortgage-industry/industry-trends/budget-2026-the-biggest-housing-announcements-for-brokers/596507"}, {"label": "Bloomberg, Nov 5", "url": "https://www.bloomberg.com/news/articles/2026-11-05/canada-budget-2026-carney-relaxes-foreign-buyer-ban-adds-billions-for-housing"}], "status": "research", "timely": "Proposed, not law yet", "title": "Budget 2026: what it could mean for buyers", "verifiedOn": "2026-11-06", "id": "i12-budget"}, {"createdAt": "2026-11-07T14:00:00Z", "facts": ["You have to qualify at your mortgage rate plus 2%, or 5.25%, whichever is higher.", "Offered 4.00%? You’re tested at 6.00%.", "It applies to both insured and uninsured mortgages at federally regulated lenders.", "Canada’s banking regulator kept the rule unchanged in January 2026."], "hook": "Your bank tests you at a higher rate than you’ll actually pay. Here’s the math.", "notes": "Good as a Big number slide: “+2%”. The 4.00% example is just an illustration, not a quoted rate.", "order": 13, "sources": [{"label": "TRREB, Mortgage stress test", "url": "https://trreb.ca/wp-content/files/homeownership/Mortgage-Stress-Test.pdf"}, {"label": "Loans Canada, stress test in 2026", "url": "https://loanscanada.ca/mortgage/the-canadian-mortgage-stress-test/"}], "status": "research", "timely": "Re-check if OSFI announces a change", "title": "The stress test, in one line", "verifiedOn": "2026-11-07", "id": "i13-stress"}, {"createdAt": "2026-11-07T14:00:00Z", "facts": ["5% to 9.99% down: 4.00% of your mortgage.", "10% to 14.99% down: 3.10%.", "15% to 19.99% down: 2.80%. At 20% or more, no insurance needed.", "Choosing a 30-year amortization adds 0.20%.", "Example: a $500,000 home with 5% down means a $475,000 mortgage and a $19,000 premium, usually added to the mortgage.", "In Ontario, 8% sales tax on the premium is paid in cash at closing."], "hook": "Under 20% down? Here’s the fee most buyers don’t see coming.", "notes": "Works as a Checklist or List slide: four tiers. Rates are CMHC’s; Sagen and Canada Guaranty use the same schedule.", "order": 14, "sources": [{"label": "CMHC, premium rates", "url": "https://cmhc-schl.gc.ca/en/finance-and-investing/mortgage-loan-insurance/the-resource/mortgage-loan-insurance-and-premiums"}, {"label": "CMHC premium example with Ontario tax", "url": "https://calcuris.com/ca/cmhc-insurance-calculator/"}], "status": "research", "timely": "", "title": "What mortgage insurance costs", "verifiedOn": "2026-11-07", "id": "i14-cmhc"}, {"createdAt": "2026-11-07T14:00:00Z", "facts": ["Claim $10,000 on line 31270 of your tax return, the “home buyers’ amount”.", "It was worth up to $1,500. Because the lowest federal tax rate dropped, it’s worth about $1,400 for homes bought in 2026.", "You can split it with your spouse, but the total claim can’t go over $10,000.", "It lowers tax you owe. It isn’t paid out as cash if you owe no tax."], "hook": "Bought your first home this year? Don’t miss this line on your taxes.", "notes": "Correction to watch: many sites still say $1,500. That was true at a 15% rate; the lowest federal rate is now 14%. Confirm the exact figure on CRA’s page in tax season before posting.", "order": 15, "sources": [{"label": "CRA, line 31270", "url": "https://www.cra-arc.gc.ca/hbtc/"}, {"label": "H&R Block, how much you can claim (2026)", "url": "https://www.hrblock.ca/blog/first-time-home-buyer-tax-credit-how-much-can-you-claim"}], "status": "research", "timely": "Best posted Feb to April (tax season)", "title": "The first-home tax credit most people forget", "verifiedOn": "2026-11-07", "id": "i15-hba"}, {"createdAt": "2026-11-07T14:00:00Z", "facts": ["1 year: workmanship and materials, Building Code violations, and whether the home is fit to live in.", "2 years: water getting in through the basement or foundation, plus the electrical, plumbing and heating systems.", "7 years: major structural defects.", "All three start on your possession date, and the warranty stays with the home if it’s sold within seven years."], "hook": "New build? Your warranty comes in three parts: 1, 2 and 7.", "notes": "Great as a Steps or Tip slide (1 / 2 / 7). Coverage is summarized; whether a specific item qualifies is Tarion’s call.", "order": 16, "sources": [{"label": "Tarion, warranty coverage brochure", "url": "https://www.tarion.com/sites/default/files/2022-12/Print%20Condo%20Warranty%20Brochure%20-%20FINAL.pdf"}, {"label": "Tarion, 5 questions new owners ask", "url": "https://www.tarion.com/media/5-questions-we-often-get-new-home-owners"}], "status": "research", "timely": "", "title": "New build warranty: 1, 2 and 7", "verifiedOn": "2026-11-07", "id": "i16-tarion"}, {"createdAt": "2026-11-07T14:00:00Z", "facts": ["It’s called a status certificate. It shows the condo’s finances, reserve fund, and any special assessments or lawsuits the corporation has disclosed.", "The condo can charge up to $100, including taxes.", "It must be delivered within 10 days of the request and payment.", "Most buyers make their offer conditional on their lawyer reviewing it."], "hook": "Buying a resale condo? Ask for this before you go firm.", "notes": "Simple Big number slide: “$100 · 10 days”.", "order": 17, "sources": [{"label": "Condominium Authority of Ontario, status certificates", "url": "https://www.condoauthorityontario.ca/knowledge-base/what-is-a-status-certificate/"}, {"label": "Nihang Law, status certificates (Sept 2026)", "url": "https://www.nihanglaw.ca/blog-status-certificate-ontario-condo/"}], "status": "research", "timely": "", "title": "The condo document to read before you go firm", "verifiedOn": "2026-11-07", "id": "i17-status"}, {"createdAt": "2026-11-07T14:00:00Z", "facts": ["Ontario land transfer tax on $700,000: $10,475.", "Toronto adds its own land transfer tax: another $10,475.", "Total: $20,950.", "First-time buyer rebates: up to $4,000 (Ontario) plus $4,475 (Toronto) = $8,475.", "First-time buyer pays: $12,475."], "hook": "Buying a $700K home in Toronto? Here’s your land transfer tax, before and after first-time rebates.", "notes": "I worked out the numbers from the published rates (0.5%, 1%, 1.5%, 2% brackets, identical for Ontario and Toronto up to $2M). First-time eligibility rules are in the “First-time buyer” idea. Ask a lawyer to confirm for a real purchase.", "order": 18, "sources": [{"label": "City of Toronto, MLTT rates", "url": "https://www.toronto.ca/services-payments/property-taxes-utilities/municipal-land-transfer-tax-mltt/municipal-land-transfer-tax-mltt-rates-and-fees"}, {"label": "Ontario land transfer tax rates", "url": "https://isure.ca/inews/land-transfer-tax-in-ontario/"}], "status": "research", "timely": "", "title": "Land transfer tax on a $700K Toronto home", "verifiedOn": "2026-11-07", "id": "i18-ltt700"}, {"createdAt": "2026-11-07T01:20:05.975Z", "facts": ["Most homes are detached and semi-detached houses, two to three storeys tall, built in the late 1800s and early 1900s.", "You’ll also find row houses, plus mid- and high-rise buildings, mostly along Walmer Road, Spadina Road and St. George Street.", "About 90% of buildings in the City’s West Annex study area are one to three storeys.", "Brick is the main material on most street-facing fronts."], "hook": "Thinking of the Annex? Here’s what you’ll actually be shopping for.", "notes": "The numbers come from the City’s West Annex study area (roughly Bedford Road to Bathurst, Bloor to Dupont), not the whole neighbourhood. Traditional Annex boundaries: Bloor to Dupont, Bathurst to Avenue Road. The City’s own “Annex” neighbourhood is bigger and runs east to Yonge, so say which one you mean. If you add sale counts or prices, pull them fresh from TRREB/MLS and date them.", "order": 1794014405975, "sources": [{"label": "City of Toronto, West Annex heritage study boards (Oct 2025)", "url": "https://www.toronto.ca/wp-content/uploads/2025/10/96a3-city-planning-west-annex-community-consultation-boards-maps.pdf"}, {"label": "The Annex (boundaries, overview)", "url": "https://en.wikipedia.org/wiki/The_Annex"}], "status": "research", "timely": "", "title": "What the Annex actually looks like: homes you’ll find", "verifiedOn": "2026-11-07", "id": "imw5puuzbppapf"}, {"createdAt": "2026-11-07T01:20:30.060Z", "facts": ["Developer Simeon Janes named his subdivision “The Toronto Annex”, and Toronto annexed the area in 1887. The western part followed in 1888.", "About 70% of buildings in the City’s West Annex study area went up between 1899 and 1919.", "The “Annex style” house mixes big rounded Romanesque arches with Queen Anne details like turrets.", "Architect E.J. Lennox’s 1887 house at 37 Madison Avenue set the template for the style."], "hook": "Ever wonder why the Annex looks so storybook? Here’s why!", "notes": "Checked: name origin, 1887 annexation, Annex style, Lennox. I left out famous past residents: the lists online aren’t reliably sourced. The 70% figure covers the City’s West Annex study area only.", "order": 1794014430060, "sources": [{"label": "City of Toronto, West Annex heritage study boards (Oct 2025)", "url": "https://www.toronto.ca/wp-content/uploads/2025/10/96a3-city-planning-west-annex-community-consultation-boards-maps.pdf"}, {"label": "Globe and Mail on the Annex style and 37 Madison Ave", "url": "https://www.theglobeandmail.com/real-estate/a-stylish-home-and-torontos-own/article18435513"}, {"label": "Annex Residents’ Association, architectural history", "url": "https://annex.nationbuilder.com/architectural_history"}], "status": "research", "timely": "", "title": "Why the Annex has so many century-old homes", "verifiedOn": "2026-11-07", "id": "imw5pvdkclzu8c"}, {"createdAt": "2026-11-07T01:20:32.822Z", "facts": ["The East Annex has been a Heritage Conservation District since 1994, roughly Bedford Road to Avenue Road, Bloor to Davenport.", "Madison Avenue, from Bloor to Dupont, became a Heritage Conservation District in 2019.", "The City is studying the rest of the West Annex (Bedford to Bathurst, Bloor to Dupont) as a possible district. It isn’t designated yet.", "Inside a district, changes to the outside of a house that people can see from the street usually need a heritage permit. Interior work usually doesn’t. Each district’s plan sets the exact rules.", "Before you go firm, have your lawyer check whether the house is in a district or on the City’s Heritage Register."], "hook": "Dreaming of renovating an Annex gem? Check this first!", "notes": "Check the City’s West Annex Phase II page right before posting: if Council designates it, the third fact changes. The permit rule is general; keep the wording “usually” and point people to the district plan rather than promising what they can or can’t change.", "order": 1794014432822, "sources": [{"label": "City of Toronto, West Annex Phase II HCD study", "url": "https://www.toronto.ca/city-government/planning-development/planning-studies-initiatives/west-annex-phase-2-heritage-conservation-district-study/"}, {"label": "Ontario Heritage Trust, East Annex designation", "url": "https://heritagetrust.on.ca/oha/details/file?id=12171"}, {"label": "Example of HCD permit rules (South Rosedale)", "url": "https://southrosedale.org/?p=5905"}], "status": "research", "timely": "Re-check the West Annex study status before posting", "title": "Annex heritage districts: what it means for renovations", "verifiedOn": "2026-11-07", "id": "imw5pvfp2dp1v0"}, {"createdAt": "2026-11-07T01:20:34.967Z", "facts": ["Bloor Street West, Dupont Street and Mirvish Village are the Annex’s main shopping strips, each with its own Business Improvement Area.", "Shops and restaurants cluster near Bloor and Dupont, while most side streets stay residential."], "hook": "Your future neighbourhood has the best weekend spots. Let’s explore!", "notes": "I can only confirm the area-level facts. Pick the specific spots yourself and check each one is open right before you post (names, hours and owners change often). Don’t imply a sponsorship that isn’t there, and ask before featuring a business’s logo or interior photos. Check your brokerage’s advertising rules for the post.", "order": 1794014434967, "sources": [{"label": "City of Toronto, West Annex heritage study boards (Oct 2025)", "url": "https://www.toronto.ca/wp-content/uploads/2025/10/96a3-city-planning-west-annex-community-consultation-boards-maps.pdf"}], "status": "research", "timely": "Confirm each named spot the week you post", "title": "Eat, browse and wander: Annex local favourites", "verifiedOn": "2026-11-07", "id": "imw5pvhcn3zvyo"}, {"createdAt": "2026-11-07T01:20:36.429Z", "facts": ["The Annex sits just north of the University of Toronto’s St. George campus, and some university buildings are inside the neighbourhood.", "Homes range from single-family houses to high-rise apartments, so very different households share the same streets.", "Churches, schools and community services are mixed in among the houses."], "hook": "Who lives in the Annex? A friendly mix, actually!", "notes": "I couldn’t confirm current population numbers from one clear official source: the City’s neighbourhood profile uses a bigger “Annex” area (east to Yonge), so websites quote very different figures. Avoid percentages (renters, income, ages) unless you pull them from the City’s Neighbourhood Profile for Annex (#95) and say so. I also left out famous residents.", "order": 1794014436429, "sources": [{"label": "City of Toronto, West Annex heritage study boards (Oct 2025)", "url": "https://www.toronto.ca/wp-content/uploads/2025/10/96a3-city-planning-west-annex-community-consultation-boards-maps.pdf"}], "status": "research", "timely": "", "title": "Annex neighbours: students, families and creatives", "verifiedOn": "2026-11-07", "id": "imw5pvih9bcvnj"}, {"createdAt": "2026-11-07T01:20:37.069Z", "facts": ["Four subway stations serve the area: St. George, Spadina, Bathurst and Dupont.", "St. George and Spadina connect Line 1 and Line 2, so you can head north, south, east or west without going outside.", "St. George Street has bike lanes."], "hook": "Car-free living in the Annex? Here’s how it works!", "notes": "I didn’t add a Walk Score: it changes, so if you use one, quote the source and date. Bloor Street’s bike lanes have been in dispute between the province and the City, so check their status before mentioning them. Check TTC service alerts for any station closures the week you post.", "order": 1794014437069, "sources": [{"label": "City of Toronto, West Annex heritage study boards (Oct 2025)", "url": "https://www.toronto.ca/wp-content/uploads/2025/10/96a3-city-planning-west-annex-community-consultation-boards-maps.pdf"}, {"label": "TTC, Spadina Station", "url": "https://www.ttc.ca/en/subway-stations/spadina-station"}], "status": "research", "timely": "", "title": "Getting around the Annex without a car", "verifiedOn": "2026-11-07", "id": "imw5pviz13zb8q"}]</script>
+<script type="application/json" id="starter-photos">[{"id": "p01", "file": "library-01.jpg", "name": "Living room with lounge chairs", "category": "interior", "order": 1}, {"id": "p02", "file": "library-02.jpg", "name": "Dining room with fireplace", "category": "interior", "order": 2}, {"id": "p03", "file": "library-03.jpg", "name": "Cozy reading nook", "category": "interior", "order": 3}, {"id": "p04", "file": "library-04.jpg", "name": "Sunroom dining nook", "category": "interior", "order": 4}, {"id": "p05", "file": "library-05.jpg", "name": "Bright living room with fireplace", "category": "interior", "order": 5}, {"id": "p06", "file": "library-06.jpg", "name": "Beamed living room", "category": "interior", "order": 6}, {"id": "p07", "file": "library-07.jpg", "name": "Couch and armchair by window", "category": "interior", "order": 7}, {"id": "p08", "file": "library-08.jpg", "name": "Shelves and sofa", "category": "interior", "order": 8}, {"id": "p09", "file": "library-09.jpg", "name": "Soft-focus leaf", "category": "nature", "order": 9}, {"id": "p10", "file": "library-10.jpg", "name": "Cotton stems and cabinet", "category": "interior", "order": 10}, {"id": "p11", "file": "library-11.jpg", "name": "Black and white building", "category": "abstract", "order": 11}, {"id": "p12", "file": "library-12.jpg", "name": "Open-concept kitchen and dining", "category": "interior", "order": 12}, {"id": "p13", "file": "library-13.jpg", "name": "Armchair with HOME sign", "category": "interior", "order": 13}, {"id": "p14", "file": "library-14.jpg", "name": "Marble wall and egg chair", "category": "interior", "order": 14}, {"id": "p15", "file": "library-15.jpg", "name": "Living room with staircase", "category": "interior", "order": 15}, {"id": "p16", "file": "library-16.jpg", "name": "Living room with ceiling fan", "category": "interior", "order": 16}, {"id": "p17", "file": "library-17.jpg", "name": "Classic fireplace living room", "category": "interior", "order": 17}, {"id": "p18", "file": "library-18.jpg", "name": "Warm living room with painting", "category": "interior", "order": 18}, {"id": "p19", "file": "library-19.jpg", "name": "Leather chair and desk", "category": "interior", "order": 19}, {"id": "p20", "file": "library-20.jpg", "name": "Soft grey living room", "category": "interior", "order": 20}, {"id": "p21", "file": "library-21.jpg", "name": "Armchair on concrete wall", "category": "interior", "order": 21}, {"id": "p22", "file": "library-22.jpg", "name": "Dried flowers and candle", "category": "interior", "order": 22}, {"id": "p23", "file": "library-23.jpg", "name": "Simple living room", "category": "interior", "order": 23}, {"id": "p24", "file": "library-24.jpg", "name": "White fireplace living room", "category": "interior", "order": 24}, {"id": "p25", "file": "library-25.jpg", "name": "Sage green wall and sofa", "category": "interior", "order": 25}, {"id": "p26", "file": "library-26.jpg", "name": "Orange accent living room", "category": "interior", "order": 26}, {"id": "p27", "file": "library-27.jpg", "name": "Mustard wall living room", "category": "interior", "order": 27}, {"id": "p28", "file": "library-28.jpg", "name": "Round window cafe", "category": "interior", "order": 28}, {"id": "p29", "file": "library-29.jpg", "name": "Little white houses", "category": "abstract", "order": 29}, {"id": "p30", "file": "library-30.jpg", "name": "Wooden house models", "category": "abstract", "order": 30}, {"id": "p31", "file": "library-31.jpg", "name": "Vaulted living room with beams", "category": "interior", "order": 31}, {"id": "p32", "file": "library-32.jpg", "name": "Open kitchen and living area", "category": "interior", "order": 32}, {"id": "p33", "file": "library-33.jpg", "name": "White kitchen island with stools", "category": "interior", "order": 33}, {"id": "p34", "file": "library-34.jpg", "name": "Monstera on white console", "category": "interior", "order": 34}, {"id": "p35", "file": "library-35.jpg", "name": "Open living and dining with wood stove", "category": "interior", "order": 35}, {"id": "p36", "file": "library-36.jpg", "name": "Green armchair and rattan mirror", "category": "interior", "order": 36}, {"id": "p37", "file": "library-37.jpg", "name": "Monstera and cozy chair", "category": "interior", "order": 37}, {"id": "p38", "file": "library-38.jpg", "name": "Arched hallway in beige", "category": "interior", "order": 38}, {"id": "p39", "file": "library-39.jpg", "name": "Console with blank frame", "category": "interior", "order": 39}, {"id": "p40", "file": "library-40.jpg", "name": "Plants and white side table", "category": "interior", "order": 40}, {"id": "p41", "file": "library-41.jpg", "name": "Green velvet sofa", "category": "interior", "order": 41}, {"id": "p42", "file": "library-42.jpg", "name": "Dried flowers on brown wall", "category": "interior", "order": 42}, {"id": "p43", "file": "library-43.jpg", "name": "Fireplace and built-in shelves", "category": "interior", "order": 43}, {"id": "p44", "file": "library-44.jpg", "name": "Beige armchair with art", "category": "interior", "order": 44}, {"id": "p45", "file": "library-45.jpg", "name": "Pink velvet armchair", "category": "interior", "order": 45}, {"id": "p46", "file": "library-46.jpg", "name": "Olive sectional and big windows", "category": "interior", "order": 46}, {"id": "p47", "file": "library-47.jpg", "name": "Sunny home office nook", "category": "interior", "order": 47}, {"id": "p48", "file": "library-48.jpg", "name": "Bay window living room", "category": "interior", "order": 48}, {"id": "p49", "file": "library-49.jpg", "name": "Sage green room", "category": "interior", "order": 49}, {"id": "p50", "file": "library-50.jpg", "name": "Sage sofa with pouf", "category": "interior", "order": 50}, {"id": "p51", "file": "library-51.jpg", "name": "Grey sofa with abstract art", "category": "interior", "order": 51}, {"id": "p52", "file": "library-52.jpg", "name": "Sage sofa with round table", "category": "interior", "order": 52}, {"id": "p53", "file": "library-53.jpg", "name": "Chair and empty frames", "category": "interior", "order": 53}, {"id": "p54", "file": "library-54.jpg", "name": "Dandelion close-up", "category": "nature", "order": 54}, {"id": "p55", "file": "library-55.jpg", "name": "Hydrangeas behind misty glass", "category": "nature", "order": 55}, {"id": "p56", "file": "library-56.jpg", "name": "Winter road through trees, from above", "category": "nature", "order": 56}, {"id": "p57", "file": "library-57.jpg", "name": "Frosted branches", "category": "nature", "order": 57}, {"id": "p58", "file": "library-58.jpg", "name": "Striped leaf close-up", "category": "nature", "order": 58}, {"id": "p59", "file": "library-59.jpg", "name": "Dried lily petal", "category": "nature", "order": 59}, {"id": "p60", "file": "library-60.jpg", "name": "Pampas grass", "category": "nature", "order": 60}, {"id": "p61", "file": "library-61.jpg", "name": "Sage succulent leaves", "category": "nature", "order": 61}, {"id": "p62", "file": "library-62.jpg", "name": "Mushroom gills", "category": "nature", "order": 62}, {"id": "p63", "file": "library-63.jpg", "name": "Snowy forest from above", "category": "nature", "order": 63}, {"id": "p64", "file": "library-64.jpg", "name": "Blurred winter forest", "category": "nature", "order": 64}, {"id": "p65", "file": "library-65.jpg", "name": "Snow on evergreen", "category": "nature", "order": 65}]</script>
 <div class="app">
   <aside class="side">
     <div class="brandmark"><div class="name" id="bm-name">Content Studio</div><div class="sub">Posts, carousels and ideas</div></div>
@@ -333,7 +391,7 @@ dialog .row.end{justify-content:flex-end;margin-top:6px}
       <button data-nav="singles"><span>Single posts</span><span class="count" id="n-single"></span></button>
       <button data-nav="photos"><span>Photos</span><span class="count" id="n-photos"></span></button>
       <button data-nav="ideas"><span>Idea research</span><span class="count" id="n-ideas"></span></button>
-      <button data-nav="used"><span>Used ideas</span><span class="count" id="n-used"></span></button>
+      <button data-nav="used"><span>Used</span><span class="count" id="n-used"></span></button>
       <button data-nav="brand"><span>Brand settings</span><span class="count"></span></button>
     </nav>
     <div class="status" id="store-status">Connecting…</div>
@@ -346,18 +404,21 @@ dialog .row.end{justify-content:flex-end;margin-top:6px}
 <script>
 /* =========================== constants =========================== */
 const DEFAULT_BRAND = {
-  name:'', handle:'@yourhandle', extra:'',
-  bg:'#EAE1D5', card:'#FFFFFF', accent:'#A68C72', ink:'#2E2823', soft:'#F5F0E9',
-  displayFont:'Playfair Display', bodyFont:'Jost', scriptFont:'',
+  name:'', handle:'', extra:'',
+  bg:'#EAE1D5', card:'#FFFFFF', accent:'#A68C72', ink:'#2E2823', soft:'#F5F0E9', sage:'#DDE7DC', tint:'#B7CFBA', tintStrength:'16',
+  displayFont:'Playfair Display', bodyFont:'Jost', scriptFont:'', tipsFont:'Great Vibes',
   headshotId:'', headshotData:'', fontFiles:[]
 };
 const DIM = {post:{w:1080,h:1350,label:'Post 4:5'}, story:{w:1080,h:1920,label:'Story 9:16'}};
-const LAYOUTS = {cover:'Cover', statement:'Statement', list:'List', steps:'Steps', stat:'Big number', mythfact:'Myth vs fact', cta:'Call to action'};
-const BGS = {photo:'Photo', sand:'Sand', white:'White', taupe:'Accent', ink:'Deep'};
+const LAYOUTS = {cover:'Cover', statement:'Statement', split:'Photo + text', list:'List', checklist:'Checklist', steps:'Steps', stat:'Big number', tip:'Tip', compare:'Do vs don’t', mythfact:'Myth vs fact', quote:'Quote', cta:'Jen’s Tips'};
+const JEN_TIPS = 'Jen’s Tips';
+const FIRST_STARTER_IDEAS = ['i01-fhsa','i02-hst','i03-rates','i04-market','i05-cooling','i06-ltt','i07-ftb','i08-stack','i09-down','i10-bra','i11-vht','i12-budget'];
+const FIRST_STARTER_PHOTOS = Array.from({length:30},(_,k)=>'p'+String(k+1).padStart(2,'0'));
+const BGS = {photo:'Photo', sand:'Sand', sage:'Sage', white:'White', taupe:'Accent', ink:'Deep'};
 const STATUS = {research:'Researched', scripted:'Scripted', designed:'Designed', unverified:'Needs fact-check'};
 const FORMATS = ['Reel','Carousel','Single post','Story'];
 const PHOTO_CATS = {interior:'Interior', nature:'Nature', abstract:'Abstract'};
-const ELNAME = {heading:'Headline', accent:'Italic line', body:'Body text', button:'Button', items:'List', number:'Big number', myth:'Myth card', fact:'Fact card', headshot:'Headshot', sig:'Your name', rule:'Divider line', foot:'Handle and small print'};
+const ELNAME = {mark:'Quote mark', checks:'Checklist', cmp:'Comparison', tag:'Tip label', heading:'Headline', accent:'Italic line', body:'Body text', button:'Button', items:'List', number:'Big number', myth:'Myth card', fact:'Fact card', headshot:'Headshot', sig:'Your name', rule:'Divider line', foot:'Handle and small print'};
 const ICON = {
   left:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 10h10M4 14h16M4 18h10"/></svg>',
   center:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M7 10h10M4 14h16M7 18h10"/></svg>',
@@ -383,7 +444,11 @@ const fmtDate = iso => { if(!iso) return ''; const d=new Date(iso.length===10?is
 const slug = s => (String(s||'post').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,48) || 'post');
 const fmtOf = d => (d && d.format==='story') ? 'story' : 'post';
 let toastTimer;
-function toast(msg){ const t=$('#toast'); t.textContent=msg; t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true,4200); }
+function toast(msg, action){
+  const t=$('#toast'); t.textContent=msg;
+  if(action){ const b=document.createElement('button'); b.className='toast-act'; b.textContent=action.label; b.addEventListener('click',()=>{ t.hidden=true; action.fn(); }); t.appendChild(b); }
+  t.hidden=false; clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.hidden=true, action?7000:4200);
+}
 async function getCap(name){
   if(name in S.caps) return S.caps[name];
   let v=null;
@@ -422,13 +487,15 @@ const Store = {
     this.mode='local';
     const g = async k => { let v=await IDB.get('cs.'+k); if(v===undefined){ const old=lsGet('cs.'+k,undefined); if(old!==undefined){ v=old; IDB.set('cs.'+k,old); } } return v; };
     S.ideas = (await g('ideas'))||[]; S.carousels = (await g('carousels'))||[]; S.photos = (await g('photos'))||[];
-    if(!IN_CLAUDE && !(await IDB.get('cs.starterAdded'))){
+    if(!IN_CLAUDE){
       try{
         const starter = JSON.parse(document.getElementById('starter-ideas').textContent);
-        const have = new Set(S.ideas.map(i=>i.id));
-        const add = starter.filter(i=>!have.has(i.id));
-        if(add.length){ S.ideas = [...S.ideas, ...add]; await IDB.set('cs.ideas', clone(S.ideas)); }
-        await IDB.set('cs.starterAdded', true);
+        let seen = await IDB.get('cs.starterIdeasSeen');
+        if(!Array.isArray(seen)) seen = (await IDB.get('cs.starterAdded')) ? FIRST_STARTER_IDEAS : [];
+        const have=new Set(S.ideas.map(i=>i.id)), seenSet=new Set(seen);
+        const add=starter.filter(i=>!have.has(i.id) && !seenSet.has(i.id));
+        if(add.length){ S.ideas=[...S.ideas, ...add]; await IDB.set('cs.ideas', clone(S.ideas)); }
+        await IDB.set('cs.starterIdeasSeen', [...new Set([...seen, ...starter.map(i=>i.id)])]);
       }catch(e){}
     }
     S.brand = {...clone(DEFAULT_BRAND), ...((await g('brand'))||{})};
@@ -438,20 +505,24 @@ const Store = {
     setStatus(IN_CLAUDE?'Saved in this browser only':'Saved on this device. Download a backup now and then.'); applyBrand();
   },
   async addStarterPhotos(){
-    if(await IDB.get('cs.starterPhotosAdded')) return;
     let list; try{ list=JSON.parse(document.getElementById('starter-photos').textContent); }catch(e){ return; }
-    const have=new Set(S.photos.map(p=>p.id)), todo=list.filter(m=>!have.has(m.id));
-    if(todo.length) toast('Setting up your photo library…');
+    let seen=await IDB.get('cs.starterPhotosSeen');
+    if(!Array.isArray(seen)) seen=(await IDB.get('cs.starterPhotosAdded')) ? FIRST_STARTER_PHOTOS : [];
+    const seenSet=new Set(seen), have=new Set(S.photos.map(p=>p.id));
+    list.forEach(m=>{ if(have.has(m.id)) seenSet.add(m.id); });
+    const todo=list.filter(m=>!seenSet.has(m.id));
+    if(!todo.length){ await IDB.set('cs.starterPhotosSeen',[...seenSet]); return; }
+    toast(`Adding ${todo.length} photos to your library…`);
     let added=0, failed=0;
     for(const m of todo){
       try{ let r=await fetch('photos/'+m.file).catch(()=>null); if(!r||!r.ok) r=await fetch(m.file); if(!r.ok) throw 0; const data=await blobToData(await r.blob());
-        S.photos.push({id:m.id, assetId:'', data, name:m.name, category:m.category, order:m.order, createdAt:'2026-11-07T12:00:00Z'}); added++; }
+        S.photos.push({id:m.id, assetId:'', data, name:m.name, category:m.category, order:m.order, compact:true, createdAt:'2026-11-07T12:00:00Z'}); seenSet.add(m.id); added++; }
       catch(e){ failed++; }
     }
     if(added){ await this.saveLocal('photos',true); updateCounts(); if(S.view==='photos') render(); }
-    if(!failed) await IDB.set('cs.starterPhotosAdded', true);
-    else if(added) toast(`${added} library photos added. ${failed} couldn’t be found; they’ll be tried again next time.`);
-    if(added && !failed) toast(`Your photo library is ready: ${added} photos`);
+    await IDB.set('cs.starterPhotosSeen',[...seenSet]);
+    if(failed && added) toast(`${added} library photos added. ${failed} couldn’t be found; they’ll be tried again next time.`);
+    else if(added) toast(`${added} photos added to your library`);
   },
   lt:{},
   saveLocal(k, now=false){
@@ -555,7 +626,7 @@ const Store = {
 };
 function setStatus(t){ $('#store-status').textContent=t; }
 function isTyping(){ const a=document.activeElement; return a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName) && $('#main').contains(a); }
-function isBusyUI(){ return isTyping() || !!drag || $('#dlg').open; }
+function isBusyUI(){ return isTyping() || !!drag || !!tdrag || $('#dlg').open; }
 
 /* =========================== brand =========================== */
 const loadedFontLinks = new Set(['Playfair Display','Jost']);
@@ -572,7 +643,7 @@ function loadGoogleFont(family){
 let fontFaceEl;
 function applyBrand(){
   const b=S.brand;
-  [b.displayFont,b.bodyFont,b.scriptFont].forEach(loadGoogleFont);
+  [b.displayFont,b.bodyFont,b.scriptFont,b.tipsFont||'Great Vibes'].forEach(loadGoogleFont);
   if(!fontFaceEl){ fontFaceEl=document.createElement('style'); document.head.appendChild(fontFaceEl); }
   fontFaceEl.textContent = (b.fontFiles||[]).map(f=>`@font-face{font-family:"${f.family.replace(/["\\]/g,'')}";src:url("${f.data||('/_blob/'+f.assetId)}");font-display:swap;}`).join('\n');
   $('#bm-name').textContent = b.name || 'Content Studio';
@@ -580,8 +651,10 @@ function applyBrand(){
 function fam(name, fallback){ return name ? `'${name.replace(/['"]/g,'')}', ${fallback}` : fallback; }
 function brandVars(){
   const b=S.brand, display=fam(b.displayFont,'Georgia, serif');
-  return `--b-bg:${b.bg};--b-card:${b.card};--b-accent:${b.accent};--b-ink:${b.ink};--b-soft:${b.soft};`+
-         `--b-display:${display};--b-body:${fam(b.bodyFont,'system-ui, sans-serif')};--b-script:${b.scriptFont?fam(b.scriptFont,'cursive'):display};`;
+  return `--b-bg:${b.bg};--b-card:${b.card};--b-accent:${b.accent};--b-ink:${b.ink};--b-soft:${b.soft};--b-sage:${b.sage||'#DDE7DC'};`+
+         `--b-display:${display};--b-body:${fam(b.bodyFont,'system-ui, sans-serif')};--b-script:${b.scriptFont?fam(b.scriptFont,'cursive'):display};`+
+         `--b-tint:${b.tint||'#B7CFBA'};--b-tint-o:${Math.max(0,Math.min(60,parseFloat(b.tintStrength)||0))/100};`+
+         `--b-tips:${fam(b.tipsFont||'Great Vibes','cursive')};`;
 }
 function imgSrc(id,data){ return data ? data : (id ? '/_blob/'+id : ''); }
 
@@ -589,10 +662,10 @@ function imgSrc(id,data){ return data ? data : (id ? '/_blob/'+id : ''); }
 function hSize(text, base){
   const n=(text||'').length;
   const k = n<=16?1 : n<=28?.88 : n<=44?.76 : n<=64?.64 : n<=90?.54 : .46;
-  return Math.round(base*k);
+  return Math.round(base*k*1.08);
 }
 function slideHTML(s, i, n, fmt='post', opts={}){
-  const b=S.brand, bg=s.bg||'sand', photo=bg==='photo';
+  const b=S.brand, split=s.layout==='split', bg=(split&&(s.bg||'sand')==='photo')?'sand':(s.bg||'sand'), photo=bg==='photo';
   const scale = photo ? .82 : 1;
   const scriptCls = b.scriptFont ? ' script' : '';
   const pos = s.pos||{}, al = s.align||{};
@@ -602,8 +675,8 @@ function slideHTML(s, i, n, fmt='post', opts={}){
     return `<${tag} class="${cls}${a?' al-'+a:''}${opts.sel===key?' is-sel':''}" data-el="${key}"${st?` style="${st}"`:''}>${inner}</${tag}>`;
   };
   const H = (t,base)=> t ? E('heading','h2','h',br(t),`font-size:${hSize(t,base*scale)}px;`) : '';
-  const A = (t,size)=> t ? E('accent','p','acc'+scriptCls,br(t),`font-size:${Math.round(size*scale)}px;`) : '';
-  const B = t => t ? E('body','p','body',br(t),`font-size:${Math.round(38*(photo?.9:1))}px;`) : '';
+  const A = (t,size)=> t ? E('accent','p','acc'+scriptCls,br(t),`font-size:${Math.round(size*scale*1.1)}px;`) : '';
+  const B = t => { if(!t) return ''; const n=t.length; return E('body','p','body',br(t),`font-size:${Math.round((n<=110?52:n<=180?47:43)*(photo?.9:1))}px;`); };
   const P = t => t ? E('button','div','pill',esc(t)) : '';
   const items = (s.items||[]).filter(x=>x && x.trim());
   let inner='';
@@ -611,11 +684,11 @@ function slideHTML(s, i, n, fmt='post', opts={}){
     case 'cover': inner = H(s.heading,120) + A(s.accent,58) + B(s.body) + P(s.button); break;
     case 'statement': inner = H(s.heading,124) + A(s.accent,56) + (s.body?E('rule','div','rule',''):'') + B(s.body) + P(s.button); break;
     case 'list': {
-      const fs = Math.round((items.length>5?30:items.length>3?33:36)*scale);
+      const fs = Math.round((items.length>5?38:items.length>3?42:46)*scale);
       inner = H(s.heading,92) + A(s.accent,48) + (items.length?E('items','div','items',items.map(t=>`<div class="item" style="font-size:${fs}px">${esc(t)}</div>`).join('')):'') + B(s.body) + P(s.button);
       break; }
     case 'steps': {
-      const fs = Math.round((items.length>4?30:34)*scale);
+      const fs = Math.round((items.length>4?39:44)*scale);
       inner = H(s.heading,88) + A(s.accent,48) + (items.length?E('items','ol','steps',items.map((t,k)=>`<li style="font-size:${fs}px"><span class="n">${k+1}</span><span>${esc(t)}</span></li>`).join(''),`gap:${items.length>4?22:30}px;`):'') + B(s.body) + P(s.button);
       break; }
     case 'stat': {
@@ -628,17 +701,37 @@ function slideHTML(s, i, n, fmt='post', opts={}){
       break;
     case 'cta': {
       const hs = imgSrc(b.headshotId,b.headshotData);
-      inner = E('headshot','div','headshot','',hs?`background-image:url('${hs}');`:'') + H(s.heading,84) + A(s.accent,48) + B(s.body) + P(s.button) +
+      inner = E('headshot','div','headshot','',hs?`background-image:url('${hs}');`:'') + H(s.heading,112) + A(s.accent,48) + B(s.body) + P(s.button) +
         ((b.name||b.extra)?E('sig','div','sig',`${b.name?`<b>${esc(b.name)}</b>`:''}${b.extra?`<span>${esc(b.extra)}</span>`:''}`):'');
       break; }
+    case 'checklist': {
+      const fs = Math.round((items.length>5?38:items.length>3?42:46)*scale);
+      inner = H(s.heading,92) + A(s.accent,48) + (items.length?E('checks','div','checks',items.map(t=>`<div class="check" style="font-size:${fs}px"><span class="ck">✓</span><span>${esc(t)}</span></div>`).join('')):'') + B(s.body) + P(s.button);
+      break; }
+    case 'tip':
+      inner = (s.number?E('tag','div','tag',esc(s.number)):'') + H(s.heading,104) + A(s.accent,52) + B(s.body) + P(s.button);
+      break;
+    case 'compare': {
+      const it2=(s.items2||[]).filter(x=>x && x.trim());
+      const n=Math.max(items.length,it2.length), fs=Math.round((n>4?38:n>2?42:46)*Math.max(scale,.94));
+      const col=(cls,ic,title,list)=>`<div class="cmp-col ${cls}"><div class="cmp-t"><span class="ic">${ic}</span><span>${esc(title)}</span></div>${list.map(t=>`<div class="cmp-i" style="font-size:${fs}px">${esc(t)}</div>`).join('')}</div>`;
+      inner = H(s.heading,84) + E('cmp','div','cmp', col('do','✓',s.leftTitle||'Do this',items) + col('dont','✕',s.rightTitle||'Not this',it2)) + B(s.body);
+      break; }
+    case 'quote':
+      inner = E('mark','div','qmark','“') + (s.heading?E('heading','h2','h quote-text',br(s.heading),`font-size:${hSize(s.heading,96*scale)}px;`):'') + A(s.accent,46) + B(s.body) + P(s.button);
+      break;
+    case 'split':
+      inner = H(s.heading,96) + A(s.accent,50) + B(s.body) + P(s.button);
+      break;
     default: inner = H(s.heading,110) + B(s.body);
   }
-  const footBits = `${s.footnote?`<span class="fn">${br(s.footnote)}</span>`:''}${b.handle?`<span>${esc(b.handle)}</span>`:''}`;
+  const footBits = `${s.footnote?`<span class="fn">${br(s.footnote)}</span>`:''}${s.showHandle&&b.handle?`<span>${esc(b.handle)}</span>`:''}`;
   const footIn = photo && footBits ? E('foot','div','foot-in',footBits) : '';
   const footOut = !photo && footBits ? E('foot','div','foot',footBits) : '';
-  const src = photo ? imgSrc(s.photoId,s.photoData) : '';
+  const src = (photo||split) ? imgSrc(s.photoId,s.photoData) : '';
   const ph = photo ? `<div class="ph" style="${src?`background-image:url('${src}')`:''}"></div><div class="ph-veil"></div>` : '';
-  return `<div class="slide fmt-${fmt} bg-${bg} lay-${s.layout}">${ph}<div class="panel">${inner}${footIn}</div>${footOut}</div>`;
+  const sp = split ? `<div class="split-ph" style="${src?`background-image:url('${src}')`:''}"></div>` : '';
+  return `<div class="slide fmt-${fmt} bg-${bg} lay-${s.layout}">${ph}${sp}${photo?'':'<div class="tint"></div>'}<div class="panel">${inner}${footIn}</div>${footOut}</div>`;
 }
 function frameHTML(s,i,n,fmt='post',opts={}){ return `<div class="frame fmt-${fmt}${opts.live?' live':''}"><div class="brand-scope" style="${esc(brandVars())}">${slideHTML(s,i,n,fmt,opts)}</div></div>`; }
 const ro = new ResizeObserver(entries=>{ for(const e of entries){ e.target.style.setProperty('--s', (e.contentRect.width/1080).toFixed(4)); } });
@@ -647,25 +740,26 @@ function fitFrames(root=document){ root.querySelectorAll('.frame').forEach(f=>{ 
 /* =========================== nav / render =========================== */
 function usageMap(){
   const m={};
-  S.carousels.forEach(c=>{ const seen=new Set(); (c.slides||[]).forEach(s=>{ const k=s.bg==='photo'?(s.photoId||s.photoData):''; if(k && !seen.has(k)){ seen.add(k); m[k]=(m[k]||0)+1; } }); });
+  S.carousels.forEach(c=>{ const seen=new Set(); (c.slides||[]).forEach(s=>{ const k=(s.bg==='photo'||s.layout==='split')?(s.photoId||s.photoData):''; if(k && !seen.has(k)){ seen.add(k); const u=m[k]||(m[k]={posted:0,drafts:0}); if(c.posted) u.posted++; else u.drafts++; } }); });
   return m;
 }
 function libraryPhotos(){
-  const use=usageMap();
-  const lib = S.photos.map(p=>({...p, src:imgSrc(p.assetId,p.data), used:use[p.assetId||p.data]||0}));
+  const use=usageMap(), none={posted:0,drafts:0};
+  const lib = S.photos.map(p=>{ const u=use[p.assetId||p.data]||none; return {...p, src:imgSrc(p.assetId,p.data), used:u.posted, drafts:u.drafts}; });
   const known = new Set(lib.map(p=>p.assetId||p.data));
   const refs=[];
-  S.carousels.forEach(c=>(c.slides||[]).forEach(s=>{ const k=s.photoId||s.photoData; if(k && !known.has(k)){ known.add(k); refs.push({id:'ref-'+refs.length, assetId:s.photoId||'', data:s.photoData||'', ref:true, category:'', used:use[k]||0, src:imgSrc(s.photoId,s.photoData)}); } }));
+  S.carousels.forEach(c=>(c.slides||[]).forEach(s=>{ const k=s.photoId||s.photoData; if(k && !known.has(k)){ known.add(k); refs.push({id:'ref-'+refs.length, assetId:s.photoId||'', data:s.photoData||'', ref:true, category:'', used:(use[k]||none).posted, drafts:(use[k]||none).drafts, src:imgSrc(s.photoId,s.photoData)}); } }));
   return [...lib.sort((a,b)=>(a.order||0)-(b.order||0) || (b.createdAt||'').localeCompare(a.createdAt||'')), ...refs];
 }
 const usedLabel = n => n ? `Used in ${n} ${n>1?'posts':'post'}` : '';
+const formatName = d => fmtOf(d)==='story' ? 'Story' : (d.kind==='single' ? 'Single post' : 'Carousel');
 function updateCounts(){
-  $('#n-car').textContent = S.carousels.filter(c=>c.kind!=='single').length || '';
-  $('#n-single').textContent = S.carousels.filter(c=>c.kind==='single').length || '';
+  $('#n-car').textContent = S.carousels.filter(c=>c.kind!=='single'&&!c.posted).length || '';
+  $('#n-single').textContent = S.carousels.filter(c=>c.kind==='single'&&!c.posted).length || '';
   $('#n-photos').textContent = libraryPhotos().length || '';
   $('#n-ideas').textContent = S.ideas.filter(i=>i.status!=='used').length || '';
-  $('#n-used').textContent = S.ideas.filter(i=>i.status==='used').length || '';
-  const car=curCar(); const navView = S.view==='editor' ? (car&&car.kind==='single'?'singles':'carousels') : S.view;
+  $('#n-used').textContent = (S.carousels.filter(c=>c.posted).length + S.ideas.filter(i=>i.status==='used').length) || '';
+  const car=curCar(); const navView = S.view==='editor' ? (car&&car.posted?'used':car&&car.kind==='single'?'singles':'carousels') : S.view;
   document.querySelectorAll('[data-nav]').forEach(b=>{ if(b.closest('.nav')) b.setAttribute('aria-current', b.dataset.nav===navView?'page':'false'); });
 }
 function go(view){ S.view=view; if(view!=='editor'){ S.editing=null; S.sel=null; } render(); $('#main').focus({preventScroll:true}); window.scrollTo(0,0); }
@@ -680,7 +774,7 @@ function render(){
 /* ---------- design lists ---------- */
 function viewDesigns(kind){
   const single = kind==='single';
-  const list=S.carousels.filter(c=> single ? c.kind==='single' : c.kind!=='single').sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
+  const list=S.carousels.filter(c=> !c.posted && (single ? c.kind==='single' : c.kind!=='single')).sort((a,b)=>(b.updatedAt||'').localeCompare(a.updatedAt||''));
   $('#main').innerHTML = `
   <div class="view-head"><div><h1>${single?'Single posts':'Carousels'}</h1><p>${single?'One-image posts in your brand style. Switch any of them to story size in the editor.':'Swipeable posts in your brand style. Download them as images, or as an editable file for Canva.'}</p></div>
   <div class="row"><button class="btn primary" data-act="${single?'new-single':'new-car'}">${single?'New single post':'New carousel'}</button></div></div>
@@ -688,14 +782,14 @@ function viewDesigns(kind){
     const first=c.slides&&c.slides[0], fmt=fmtOf(c);
     return `<div class="car-card"><button class="open" data-open="${esc(c.id)}">${first?frameHTML(first,0,c.slides.length,fmt):'<div class="frame"></div>'}
       <div class="meta"><div class="t">${esc(c.title||'Untitled')}</div><div class="m">${fmt==='story'?'<span class="badge">Story</span>':''}${single?'':`${(c.slides||[]).length} slides,`} edited ${fmtDate(c.updatedAt)}</div></div></button>
-      <div class="acts"><button class="btn small ghost" data-story-copy="${esc(c.id)}">${fmt==='story'?'Post copy':'Story copy'}</button><button class="btn small ghost" data-dup="${esc(c.id)}">Duplicate</button></div></div>`;}).join('')}</div>`
+      <div class="acts"><div class="acts-main"><button class="btn small pill-ok" data-mark-posted="${esc(c.id)}">Mark as posted</button><button class="btn small pill-del" data-del-design="${esc(c.id)}">Delete</button></div><div class="acts-more"><button class="btn small ghost" data-story-copy="${esc(c.id)}">${fmt==='story'?'Post copy':'Story copy'}</button><button class="btn small ghost" data-dup="${esc(c.id)}">Duplicate</button></div></div></div>`;}).join('')}</div>`
   : `<div class="empty"><h2>${single?'No single posts yet':'No carousels yet'}</h2><p>${single?'Start one here, or pick a photo from your library and make a post from it.':'Start a blank one, or pick a researched idea and turn it into slides.'}</p><div class="row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-act="${single?'new-single':'new-car'}">${single?'New single post':'New carousel'}</button><button class="btn" data-nav="${single?'photos':'ideas'}">${single?'Open photos':'See ideas'}</button></div></div>`}`;
 }
 function blankSlides(){
   return [
     {id:uid('s'),layout:'cover',bg:'photo',heading:'Your headline here',accent:'a short supporting line',body:'',button:'Swipe for more',items:[]},
     {id:uid('s'),layout:'list',bg:'sand',heading:'Three things to know',items:['First point','Second point','Third point'],body:''},
-    {id:uid('s'),layout:'cta',bg:'white',heading:'Questions? Let’s talk.',body:'Send me a message any time.',button:'Send me a DM',items:[]}
+    {id:uid('s'),layout:'cta',bg:'white',heading:JEN_TIPS,accent:'Questions? Let’s talk.',body:'Send me a message any time.',button:'Send me a DM',items:[]}
   ];
 }
 function newDesign({kind='carousel', idea=null, slides=null, format='post', title=''}={}){
@@ -711,6 +805,7 @@ function copyDesign(id, format){
   const src=S.carousels.find(c=>c.id===id); if(!src) return;
   const fmt = format || fmtOf(src);
   const d={...clone(src), id:uid('c'), format:fmt, title: src.title + (format? (fmt==='story'?' (story)':' (post)') : ' (copy)'), createdAt:new Date().toISOString()};
+  delete d.posted;
   d.slides.forEach(s=>s.id=uid('s'));
   S.carousels.push(d); Store.queueCarousel(d,0); openEditor(d.id);
   toast(format ? (fmt==='story'?'Story copy made. Check the spacing and nudge anything that needs it.':'Post copy made.') : 'Duplicate made');
@@ -729,7 +824,7 @@ function viewEditor(){
   $('#main').innerHTML = `
   <div class="ed-top">
     <div class="r1">
-      <button class="btn ghost" data-nav="${single?'singles':'carousels'}">${single?'All single posts':'All carousels'}</button>
+      <button class="btn ghost" data-nav="${car.posted?'used':single?'singles':'carousels'}">${car.posted?'Back to Used':single?'All single posts':'All carousels'}</button>
       <label class="sr" for="car-title">Title</label>
       <input id="car-title" class="title-input" value="${esc(car.title)}" data-car-title>
     </div>
@@ -739,6 +834,7 @@ function viewEditor(){
       <span class="spacer"></span>
       <button class="btn" data-story-copy="${esc(car.id)}">${fmt==='story'?'Make a post copy':'Make a story copy'}</button>
       ${single?'<button class="btn" data-act="to-carousel">Turn into carousel</button>':''}
+      ${car.posted?`<span class="badge ok">Posted ${fmtDate(car.posted.on)}</span><button class="btn" data-act="unpost">Move back to drafts</button>`:`<button class="btn" data-mark-posted="${esc(car.id)}">Mark as posted</button>`}
       <button class="btn primary" data-act="download">Download</button>
       <button class="btn ghost danger" data-act="del-car">Delete</button>
     </div>
@@ -746,13 +842,13 @@ function viewEditor(){
   ${idea?`<p style="margin:-6px 0 16px;color:var(--muted);font-size:14px">Built from the idea “${esc(idea.title)}”</p>`:''}
   <div class="ed-body${single?' single':''}">
     ${single?'':`<div class="thumbs" role="list" aria-label="Slides">
-      ${car.slides.map((sl,k)=>`<button class="thumb${fmt==='story'?' story':''}" role="listitem" data-slide="${k}" aria-current="${k===S.slideIdx}" aria-label="Slide ${k+1}"><span class="num">${k+1}</span>${frameHTML(sl,k,n,fmt)}</button>`).join('')}
+      ${car.slides.map((sl,k)=>`<div class="thumb-wrap" role="listitem" data-thumb="${k}"><button class="thumb${fmt==='story'?' story':''}" data-slide="${k}" aria-current="${k===S.slideIdx}" aria-label="Slide ${k+1}">${frameHTML(sl,k,n,fmt)}</button><span class="num" title="Drag to reorder"><svg viewBox="0 0 6 10" aria-hidden="true"><circle cx="1.2" cy="1.5" r="1"/><circle cx="4.8" cy="1.5" r="1"/><circle cx="1.2" cy="5" r="1"/><circle cx="4.8" cy="5" r="1"/><circle cx="1.2" cy="8.5" r="1"/><circle cx="4.8" cy="8.5" r="1"/></svg>${k+1}</span><button class="th-x" data-del-thumb="${k}" aria-label="Remove slide ${k+1}">×</button><button class="th-dup" data-dup-thumb="${k}" aria-label="Duplicate slide ${k+1}" title="Duplicate"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="5" y="5" width="9" height="9" rx="2"/><path d="M11 5V3.5A1.5 1.5 0 0 0 9.5 2h-6A1.5 1.5 0 0 0 2 3.5v6A1.5 1.5 0 0 0 3.5 11H5"/></svg></button></div>`).join('')}
       <button class="add-slide" data-act="add-slide">Add slide</button>
     </div>`}
     <div class="stage">
       ${s?`<div class="tools" id="tools">${toolsInner()}</div>
       <div id="stage-frame" class="fmt-${fmt}">${frameHTML(s,S.slideIdx,n,fmt,{live:true,sel:S.sel})}</div>
-      ${single?'':`<div class="stage-nav"><button class="btn small ghost" data-act="prev" ${S.slideIdx===0?'disabled':''}>Previous</button><span>Slide ${S.slideIdx+1} of ${n}</span><button class="btn small ghost" data-act="next" ${S.slideIdx>=n-1?'disabled':''}>Next</button></div>`}
+      ${single?'':`<div class="stage-nav"><button class="btn small ghost" data-act="prev" ${S.slideIdx===0?'disabled':''}>Previous</button><span>Slide ${S.slideIdx+1} of ${n}</span><button class="btn small ghost" data-act="next" ${S.slideIdx>=n-1?'disabled':''}>Next</button><button class="btn small" data-act="dup-slide">Duplicate slide</button></div>`}
       <div id="warn-box"></div>`:`<div class="empty">This design has no slides. Add one to start.</div>`}
     </div>
     ${s?fieldsHTML(s,car):'<div></div>'}
@@ -779,24 +875,30 @@ function markSel(){
   refreshTools();
 }
 function fieldsHTML(s,car){
-  const L=s.layout, f=(k,label,rows=2,hint='')=>`<div class="field"><label for="f-${k}">${label}</label><textarea id="f-${k}" rows="${rows}" data-field="${k}">${esc(k==='items'?(s.items||[]).join('\n'):(s[k]||''))}</textarea>${hint?`<span class="hint">${hint}</span>`:''}</div>`;
+  const L=s.layout, f=(k,label,rows=2,hint='')=>`<div class="field"><label for="f-${k}">${label}</label><textarea id="f-${k}" rows="${rows}" data-field="${k}">${esc((k==='items'||k==='items2')?(s[k]||[]).join('\n'):(s[k]||''))}</textarea>${hint?`<span class="hint">${hint}</span>`:''}</div>`;
   const i=(k,label,hint='')=>`<div class="field"><label for="f-${k}">${label}</label><input type="text" id="f-${k}" data-field="${k}" value="${esc(s[k]||'')}">${hint?`<span class="hint">${hint}</span>`:''}</div>`;
-  const b=S.brand, swatch={photo:'linear-gradient(135deg,'+b.soft+','+b.accent+')',sand:b.bg,white:b.card,taupe:b.accent,ink:b.ink};
-  const parts=[];
-  if(L!=='stat') parts.push(f('heading','Headline',2));
-  if(L==='stat'){ parts.push(i('number','Big number','Keep it short, like $8,000 or 30 years')); parts.push(f('heading','Line under the number',2)); }
-  if(['cover','statement','list','steps','stat','cta'].includes(L)) parts.push(i('accent','Italic line','Optional. Shows in your accent font.'));
-  if(L==='list'||L==='steps') parts.push(f('items', L==='steps'?'Steps, one per line':'List items, one per line',5, L==='steps'?'Use steps only when the order matters.':''));
-  if(L==='mythfact'){ parts.push(f('myth','Myth',2)); parts.push(f('fact','Fact',3)); }
+  const b=S.brand, swatch={photo:'linear-gradient(135deg,'+b.soft+','+b.accent+')',sand:b.bg,sage:b.sage||'#DDE7DC',white:b.card,taupe:b.accent,ink:b.ink};
+  const parts=[], acc=()=>i('accent','Italic line','Optional. Shows in your accent font.');
+  switch(L){
+    case 'stat': parts.push(i('number','Big number','Keep it short, like $8,000 or 30 years'), f('heading','Line under the number',2), acc()); break;
+    case 'tip': parts.push(i('number','Tip label','Like “Tip 3” or “Step 1 of 5”'), f('heading','Headline',2), acc()); break;
+    case 'quote': parts.push(f('heading','Quote',3), i('accent','Who said it','Optional, like “Sarah, first-time buyer”. Only use real quotes, with permission.')); break;
+    case 'compare': parts.push(f('heading','Headline',2), i('leftTitle','Left heading','Like “Do this”'), f('items','Left list, one per line',4), i('rightTitle','Right heading','Like “Not this”'), f('items2','Right list, one per line',4)); break;
+    case 'mythfact': parts.push(f('heading','Headline',2), f('myth','Myth',2), f('fact','Fact',3)); break;
+    default:
+      parts.push(f('heading','Headline',2), acc());
+      if(['list','steps','checklist'].includes(L)) parts.push(f('items', L==='steps'?'Steps, one per line':L==='checklist'?'Checklist items, one per line':'List items, one per line',5, L==='steps'?'Use steps only when the order matters.':''));
+  }
   parts.push(f('body','Body text',3));
-  if(L!=='mythfact') parts.push(i('button','Button text','Optional, like “Swipe for more” or “DM me HOME”'));
+  if(!['mythfact','compare'].includes(L)) parts.push(i('button','Button text','Optional, like “Swipe for more” or “DM me HOME”'));
   parts.push(i('footnote','Small print','Optional, like “Confirm details with your lawyer.”'));
+  parts.push(`<div class="field"><label class="check-row"><input type="checkbox" data-handle ${s.showHandle?'checked':''}> Show my handle${b.handle?` (${esc(b.handle)})`:''}</label>${b.handle?'':'<span class="hint">Add your handle in Brand settings first.</span>'}</div>`);
   const src=imgSrc(s.photoId,s.photoData);
   const single=car.kind==='single';
   return `<div class="fields">
     <div class="field"><span class="lbl">Layout</span><div class="seg" role="group" aria-label="Layout">${Object.entries(LAYOUTS).map(([k,v])=>`<button data-layout="${k}" aria-pressed="${k===L}">${v}</button>`).join('')}</div></div>
     <div class="field"><span class="lbl">Background</span><div class="seg" role="group" aria-label="Background">${Object.entries(BGS).map(([k,v])=>`<button data-bg="${k}" aria-pressed="${k===(s.bg||'sand')}"><span class="sw" style="background:${swatch[k]}"></span>${v}</button>`).join('')}</div></div>
-    ${s.bg==='photo'?`<div class="field"><span class="lbl">Photo</span><div class="row"><button class="btn small" data-act="pick-photo">${src?'Change photo':'Choose photo'}</button>${src?'<button class="btn small ghost" data-act="rm-photo">Remove</button>':''}</div><span class="hint">Pick from your photos or upload a new one. Bright interiors work best behind the card.</span></div>`:''}
+    ${(s.bg==='photo'||L==='split')?`<div class="field"><span class="lbl">Photo</span><div class="row"><button class="btn small" data-act="pick-photo">${src?'Change photo':'Choose photo'}</button>${src?'<button class="btn small ghost" data-act="rm-photo">Remove</button>':''}</div><span class="hint">${L==='split'?'Fills the top half of the slide.':'Pick from your photos or upload a new one. Bright interiors work best behind the card.'}</span></div>`:''}
     ${parts.join('')}
     ${single?'':`<div class="slide-tools">
       <button class="btn small" data-act="dup-slide">Duplicate slide</button>
@@ -819,7 +921,7 @@ function renderWarnings(){
   const facts = new Set((car.factsText.match(numRe)||[]).map(normNum));
   const ok = new Set(['1','2','3','4','5','6','7','8','9','10']);
   const bad=new Set();
-  car.slides.forEach(s=>{ const txt=[s.heading,s.accent,s.body,s.number,s.myth,s.fact,s.button,s.footnote,...(s.items||[])].join(' ');
+  car.slides.forEach(s=>{ const txt=[s.heading,s.accent,s.body,s.number,s.myth,s.fact,s.button,s.footnote,s.leftTitle,s.rightTitle,...(s.items||[]),...(s.items2||[])].join(' ');
     (txt.match(numRe)||[]).forEach(m=>{ const k=normNum(m); if(k && !facts.has(k) && !ok.has(k)) bad.add(m.trim()); }); });
   box.innerHTML = bad.size ? `<div class="warn">These numbers aren’t in your research notes for this idea: <b>${[...bad].map(esc).join(', ')}</b>. Double-check them before posting.</div>` : '';
 }
@@ -836,11 +938,11 @@ function centerAll(){
   s.align={}; const p=s.pos||{}; Object.keys(p).forEach(k=>{ p[k].x=0; if(!p[k].y) delete p[k]; }); s.pos=p;
   Store.queueCarousel(car); refreshPreview(); toast('Everything on this slide is centered');
 }
-function setCount(target){
+async function setCount(target){
   const car=curCar(); if(!car) return; target=Math.max(1,Math.min(20,Math.round(target)||1));
   const n=car.slides.length; if(target===n){ render(); return; }
   if(target>n){ for(let k=n;k<target;k++) car.slides.push({id:uid('s'),layout:'statement',bg:k%2?'white':'sand',heading:'New slide',body:'',items:[]}); }
-  else { if(!confirm(`Remove the last ${n-target} slide${n-target>1?'s':''}?`)){ render(); return; } car.slides.splice(target); if(S.slideIdx>=target) S.slideIdx=target-1; }
+  else { if(!(await askConfirm(`Remove the last ${n-target} slide${n-target>1?'s':''}?`,'Remove'))){ render(); return; } car.slides.splice(target); if(S.slideIdx>=target) S.slideIdx=target-1; }
   Store.queueCarousel(car); render();
 }
 
@@ -879,6 +981,42 @@ function endDrag(e){
 document.addEventListener('pointerup', endDrag);
 document.addEventListener('pointercancel', endDrag);
 
+/* ---------- reorder slides by dragging thumbnails ---------- */
+let tdrag=null, suppressClickUntil=0;
+document.addEventListener('pointerdown', e=>{
+  const w=e.target.closest('.thumb-wrap'); if(!w || e.target.closest('.th-x,.th-dup')) return;
+  const grip=!!e.target.closest('.num');
+  if(e.pointerType!=='mouse' && !grip) return;
+  if(grip) e.preventDefault();
+  tdrag={w, sx:e.clientX, sy:e.clientY, id:e.pointerId, started:false};
+});
+document.addEventListener('pointermove', e=>{
+  if(!tdrag || e.pointerId!==tdrag.id) return;
+  if(!tdrag.started){ if(Math.hypot(e.clientX-tdrag.sx,e.clientY-tdrag.sy)<6) return; tdrag.started=true; tdrag.w.classList.add('dragging'); try{ tdrag.w.setPointerCapture(e.pointerId); }catch(err){} }
+  const box=tdrag.w.parentElement, horiz=getComputedStyle(box).flexDirection.startsWith('row');
+  const el=document.elementFromPoint(e.clientX,e.clientY), tgt=el&&el.closest('.thumb-wrap');
+  if(tgt && tgt!==tdrag.w && tgt.parentElement===box){
+    const r=tgt.getBoundingClientRect(), after = horiz ? e.clientX>r.left+r.width/2 : e.clientY>r.top+r.height/2;
+    box.insertBefore(tdrag.w, after?tgt.nextSibling:tgt);
+  }
+  const b=box.getBoundingClientRect();
+  if(horiz){ if(e.clientX<b.left+40) box.scrollLeft-=14; else if(e.clientX>b.right-40) box.scrollLeft+=14; }
+  else { if(e.clientY<b.top+40) box.scrollTop-=14; else if(e.clientY>b.bottom-40) box.scrollTop+=14; }
+});
+function endThumbDrag(e){
+  if(!tdrag || (e && e.pointerId!==tdrag.id)) return;
+  const d=tdrag; tdrag=null; if(!d.started) return;
+  d.w.classList.remove('dragging'); suppressClickUntil=Date.now()+350;
+  const car=curCar(); if(!car) return;
+  const order=[...d.w.parentElement.querySelectorAll('.thumb-wrap')].map(x=>+x.dataset.thumb);
+  if(order.every((v,i)=>v===i)) return;
+  const cur=car.slides[S.slideIdx];
+  car.slides=order.map(i=>car.slides[i]); S.slideIdx=Math.max(0,car.slides.indexOf(cur)); S.sel=null;
+  Store.queueCarousel(car); render(); toast('Slides reordered');
+}
+document.addEventListener('pointerup', endThumbDrag);
+document.addEventListener('pointercancel', endThumbDrag);
+
 /* ---------- photos ---------- */
 function viewPhotos(){
   const all=libraryPhotos();
@@ -893,19 +1031,31 @@ function viewPhotos(){
   <div class="view-head"><div><h1>Photos</h1><p>Sorted into interior, nature and abstract. Photos already in a post are marked, so fresh ones are easy to spot.</p></div>
   <div class="row"><label class="btn primary" for="ph-up">Upload to ${esc(catName)}</label><input id="ph-up" type="file" accept="image/*" multiple class="sr" data-photo-upload></div></div>
   <div class="chips" role="group" aria-label="Photo sections">${tabs.map(([k,v])=>`<button data-photo-cat="${k}" aria-pressed="${S.photoCat===k}">${v} ${inCat(k).length}</button>`).join('')}</div>
-  ${list.length?`<p class="ph-sub">${list.length} ${list.length>1?'photos':'photo'}${usedN?`, ${usedN} already used`:', none used yet'}</p><div class="ph-grid">${list.map(p=>`<div class="ph-tile${p.used?' is-used':''}">${p.used?`<span class="ph-used">${usedLabel(p.used)}</span>`:''}<div class="ph-img" style="background-image:url('${esc(p.src)}')" role="img" aria-label="${esc(p.name||'Photo')}"></div>
+  ${list.length?`<p class="ph-sub">${list.length} ${list.length>1?'photos':'photo'}${usedN?`, ${usedN} already posted`:', none posted yet'}</p><div class="ph-grid">${list.map(p=>`<div class="ph-tile${p.used?' is-used':''}">${p.used?`<span class="ph-used">${usedLabel(p.used)}</span>`:p.drafts?'<span class="ph-draft">In a draft</span>':''}<div class="ph-img" style="background-image:url('${esc(p.src)}')" role="img" aria-label="${esc(p.name||'Photo')}"></div>
     <div class="ph-acts"><button class="btn small" data-new-from-photo="${esc(p.id)}">New post</button>${p.ref?'':moveSel(p)}${p.ref?'':`<button class="btn small ghost danger" data-del-photo="${esc(p.id)}">Delete</button>`}</div></div>`).join('')}</div>`
   : `<div class="empty"><h2>No ${esc(catName.toLowerCase())} photos yet</h2><p>Upload some here and they’ll be ready whenever you build a post.</p><div class="row" style="justify-content:center;margin-top:12px"><label class="btn primary" for="ph-up2">Upload to ${esc(catName)}</label><input id="ph-up2" type="file" accept="image/*" multiple class="sr" data-photo-upload></div></div>`}`;
 }
 async function uploadPhotos(files, category){
   category = PHOTO_CATS[category] ? category : 'interior';
   const out=[]; if(!files.length) return out;
-  toast(files.length>1?`Adding ${files.length} photos…`:'Adding your photo…');
+  toast(files.length>1?`Checking ${files.length} photos…`:'Checking your photo…');
+  const known = await libraryHashes();
+  let added=0, skipped=0;
   for(const f of files){
-    try{ const r=await storeImage(f); const p={id:uid('p'),assetId:r.id,data:r.data,name:f.name.replace(/\.[^.]+$/,''),category,createdAt:new Date().toISOString()}; await Store.putPhoto(p); out.push(p); }
+    try{
+      const url=URL.createObjectURL(f); const h=await imgHash(url); URL.revokeObjectURL(url);
+      const match = h ? known.find(k=>hashDist(k.h,h)<=DUP_LIMIT) : null;
+      if(match){ skipped++; const ex=S.photos.find(x=>x.id===match.id); if(ex) out.push(ex); continue; }
+      const r=await storeImage(f);
+      const p={id:uid('p'),assetId:r.id,data:r.data,name:f.name.replace(/\.[^.]+$/,''),category,phash:h||'',compact:true,createdAt:new Date().toISOString()};
+      await Store.putPhoto(p); out.push(p); added++;
+      if(h) known.push({id:p.id,h});
+    }
     catch(e){ toast(`${f.name} couldn’t be read. Try a JPG or PNG.`); }
   }
-  if(out.length) toast(`${out.length>1?out.length+' photos':'Photo'} added to ${PHOTO_CATS[category]}`);
+  const skipMsg = skipped ? `${skipped} ${skipped>1?'were':'was'} already in your library, so ${skipped>1?'they were':'it was'} skipped` : '';
+  if(added) toast(`${added>1?added+' photos':'Photo'} added to ${PHOTO_CATS[category]}${skipped?'. '+skipMsg+'.':''}`);
+  else if(skipped) toast(skipped>1?'Those photos are already in your library, so nothing new was added.':'That photo is already in your library.');
   return out;
 }
 function photoPicker(){
@@ -913,13 +1063,13 @@ function photoPicker(){
   const list = S.pickCat==='all' ? all : all.filter(p=>p.category===S.pickCat);
   showDialog(`<h2>Choose a photo</h2>
     <div class="chips" role="group" aria-label="Photo sections" style="margin-bottom:6px">${[['all','All'],...Object.entries(PHOTO_CATS)].map(([k,v])=>`<button data-pick-cat="${k}" aria-pressed="${S.pickCat===k}">${v}</button>`).join('')}</div>
-    ${list.length?`<div class="picker">${list.map((p,k)=>`<button data-pick="${k}" style="background-image:url('${esc(p.src)}')" aria-label="Use ${esc(p.name||'this photo')}${p.used?', '+usedLabel(p.used):''}">${p.used?'<span class="pk-used">Used</span>':''}</button>`).join('')}</div>`:'<p style="color:var(--muted)">No photos in this section yet.</p>'}
+    ${list.length?`<div class="picker">${list.map((p,k)=>`<button data-pick="${k}"${p.used?' class="is-used"':''} style="background-image:url('${esc(p.src)}')" aria-label="Use ${esc(p.name||'this photo')}${p.used?', '+usedLabel(p.used):''}"></button>`).join('')}</div>`:'<p style="color:var(--muted)">No photos in this section yet.</p>'}
     <div class="row end"><label class="btn" for="pick-up">Upload new</label><input id="pick-up" type="file" accept="image/*" multiple class="sr" data-pick-upload><button class="btn ghost" data-close>Cancel</button></div>`);
   S.pickList=list;
 }
 function applyPhoto(p){
   const car=curCar(), s=curSlide(); if(!s||!p) return;
-  s.bg='photo'; s.photoId=p.assetId||''; s.photoData=p.assetId?'':(p.data||'');
+  if(s.layout!=='split') s.bg='photo'; s.photoId=p.assetId||''; s.photoData=p.assetId?'':(p.data||'');
   Store.queueCarousel(car,0); closeDialog(); render();
 }
 
@@ -967,16 +1117,71 @@ function ideaCard(i){
 
 /* ---------- used ---------- */
 function viewUsed(){
+  const tab=S.usedTab||'posts';
+  const posts=S.carousels.filter(c=>c.posted).sort((a,b)=>(b.posted.on||'').localeCompare(a.posted.on||''));
+  const usedPhotos=libraryPhotos().filter(p=>p.used);
   const q=S.usedQuery.toLowerCase();
-  const used=S.ideas.filter(i=>i.status==='used').filter(i=>!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q)).sort((a,b)=>(b.postedOn||'').localeCompare(a.postedOn||''));
+  const allUsedIdeas=S.ideas.filter(i=>i.status==='used');
+  const used=allUsedIdeas.filter(i=>!q||(i.title+' '+(i.notes||'')).toLowerCase().includes(q)).sort((a,b)=>(b.postedOn||'').localeCompare(a.postedOn||''));
+  const tabs=[['posts','Posts',posts.length],['ideas','Ideas',allUsedIdeas.length],['photos','Photos',usedPhotos.length]];
+  let body='';
+  if(tab==='posts') body = posts.length ? `<div class="car-grid">${posts.map(c=>{ const first=c.slides&&c.slides[0], fmt=fmtOf(c);
+      return `<div class="car-card"><button class="open" data-open="${esc(c.id)}">${first?frameHTML(first,0,c.slides.length,fmt):'<div class="frame"></div>'}
+      <div class="meta"><div class="t">${esc(c.title||'Untitled')}</div><div class="m"><span class="badge ok">${formatName(c)}</span> Posted ${fmtDate(c.posted.on)}</div></div></button>
+      <div class="acts">${safeUrl(c.posted.link)?`<a class="btn small ghost" href="${esc(c.posted.link)}" target="_blank" rel="noopener noreferrer">Open post</a>`:''}<button class="btn small ghost" data-dup="${esc(c.id)}">Duplicate</button><button class="btn small ghost" data-unpost="${esc(c.id)}">Move back to drafts</button></div></div>`; }).join('')}</div>`
+    : `<div class="empty"><h2>Nothing posted yet</h2><p>When a carousel or single post goes live, open it and tap “Mark as posted”. It moves here.</p></div>`;
+  if(tab==='photos') body = usedPhotos.length ? `<div class="ph-grid">${usedPhotos.map(p=>`<div class="ph-tile is-used"><span class="ph-used">${usedLabel(p.used)}</span><div class="ph-img" style="background-image:url('${esc(p.src)}')" role="img" aria-label="${esc(p.name||'Photo')}"></div><div class="ph-acts"><span style="font-size:13px;color:var(--muted)">${esc(PHOTO_CATS[p.category]||'')}</span></div></div>`).join('')}</div>`
+    : `<div class="empty"><h2>No used photos yet</h2><p>Photos from posts you mark as posted show up here, in black and white.</p></div>`;
   $('#main').innerHTML = `
-  <div class="view-head"><div><h1>Used ideas</h1><p>Everything you’ve already posted, so you never repeat yourself by accident.</p></div>
-  <div class="row"><label class="sr" for="used-q">Search used ideas</label><input id="used-q" class="pill-input" type="text" placeholder="Search" value="${esc(S.usedQuery)}" data-used-q></div></div>
-  ${used.length?`<div class="used-wrap"><table class="used-table"><thead><tr><th>Idea</th><th>Posted</th><th>Format</th><th>Link</th><th></th></tr></thead><tbody>
+  <div class="view-head"><div><h1>Used</h1><p>Everything you’ve already posted, so you never repeat yourself by accident.</p></div>
+  ${tab==='ideas'?`<div class="row"><label class="sr" for="used-q">Search used ideas</label><input id="used-q" class="pill-input" type="text" placeholder="Search" value="${esc(S.usedQuery)}" data-used-q></div>`:''}</div>
+  <div class="chips" role="group" aria-label="Used sections">${tabs.map(([k,v,c])=>`<button data-used-tab="${k}" aria-pressed="${tab===k}">${v} ${c}</button>`).join('')}</div>
+  ${tab!=='ideas' ? body : used.length?`<div class="used-wrap"><table class="used-table"><thead><tr><th>Idea</th><th>Posted</th><th>Format</th><th>Link</th><th></th></tr></thead><tbody>
     ${used.map(i=>`<tr><td><b style="font-weight:500">${esc(i.title)}</b>${i.notes?`<div style="color:var(--muted);font-size:13px">${br(i.notes)}</div>`:''}</td><td style="white-space:nowrap">${fmtDate(i.postedOn)}</td><td>${esc(i.format||'')}</td><td>${safeUrl(i.link)?`<a href="${esc(i.link)}" target="_blank" rel="noopener noreferrer">Open post</a>`:''}</td>
     <td style="white-space:nowrap"><button class="btn small ghost" data-mark-used="${esc(i.id)}">Edit</button><button class="btn small ghost" data-restore="${esc(i.id)}">Move back</button></td></tr>`).join('')}
   </tbody></table></div>`
-  : `<div class="empty"><h2>${q?'No matches':'Nothing posted yet'}</h2><p>${q?'Try a different word.':'When you post something, open the idea and choose “Mark as used”. It’ll land here.'}</p></div>`}`;
+  : `<div class="empty"><h2>${q?'No matches':'No used ideas yet'}</h2><p>${q?'Try a different word.':'Ideas move here when you mark a post built from them as posted, or choose “Mark as used” on the idea.'}</p></div>`}`;
+}
+function postedDialog(d){
+  const idea = d.ideaId ? S.ideas.find(i=>i.id===d.ideaId) : null;
+  showDialog(`<h2>Mark as posted</h2><form id="posted-form">
+    <p style="margin:0;color:var(--muted)">${esc(d.title||'Untitled')} (${formatName(d)})</p>
+    <div class="field"><label for="po-date">Posted on</label><input type="date" id="po-date" name="on" value="${todayISO()}"></div>
+    <div class="field"><label for="po-link">Link to the post</label><input type="url" id="po-link" name="link" placeholder="https://www.instagram.com/…"></div>
+    <div class="field"><label for="po-notes">Notes</label><textarea id="po-notes" name="notes" rows="2" placeholder="How it did, what to try next time"></textarea></div>
+    ${idea&&idea.status!=='used'?`<label class="check-row"><input type="checkbox" name="idea" checked> Also move the idea “${esc(idea.title)}” to Used</label>`:''}
+    <div class="row end"><button class="btn ghost" type="button" data-close>Cancel</button><button class="btn primary" type="submit">Mark as posted</button></div>
+  </form>`);
+  const form=$('#posted-form');
+  form.addEventListener('submit',e=>{
+    e.preventDefault(); const fd=new FormData(form);
+    const on=String(fd.get('on')||todayISO()), link=String(fd.get('link')||'').trim(), notes=String(fd.get('notes')||'').trim();
+    const markIdea = !!(idea && idea.status!=='used' && fd.get('idea'));
+    d.posted={on, link, notes, ideaMarked:markIdea};
+    Store.queueCarousel(d,0);
+    if(markIdea) Store.putIdea({...idea, prevStatus:idea.status, status:'used', postedOn:on, format:formatName(d), link});
+    closeDialog(); S.view='used'; S.usedTab='posts'; S.editing=null; S.sel=null; render(); window.scrollTo(0,0);
+    toast('Marked as posted. It’s in Used now.');
+  });
+}
+function unpost(d){
+  if(!d || !d.posted) return;
+  const p=d.posted; delete d.posted; Store.queueCarousel(d,0);
+  if(p.ideaMarked){ const idea=S.ideas.find(i=>i.id===d.ideaId); if(idea && idea.status==='used') Store.putIdea({...idea, status:idea.prevStatus||'designed'}); }
+  render(); toast(`Moved back to ${d.kind==='single'?'Single posts':'Carousels'}`);
+}
+function dupSlide(k){
+  const car=curCar(); if(!car || !car.slides[k]) return;
+  car.slides.splice(k+1,0,{...clone(car.slides[k]),id:uid('s')});
+  S.slideIdx=k+1; S.sel=null; Store.queueCarousel(car); render(); toast(`Slide ${k+1} duplicated`);
+}
+function removeSlide(k){
+  const car=curCar(); if(!car) return;
+  if(car.slides.length<=1){ toast('A design needs at least one slide.'); return; }
+  const [sl]=car.slides.splice(k,1);
+  if(S.slideIdx>k || S.slideIdx>=car.slides.length) S.slideIdx=Math.max(0,S.slideIdx-1);
+  S.sel=null; Store.queueCarousel(car); render();
+  toast(`Slide ${k+1} removed`, {label:'Undo', fn:()=>{ const c=S.carousels.find(x=>x.id===car.id); if(!c) return; c.slides.splice(k,0,sl); if(S.editing===c.id){ S.slideIdx=k; render(); } Store.queueCarousel(c); }});
 }
 
 /* ---------- brand ---------- */
@@ -994,11 +1199,16 @@ function viewBrand(){
         <div class="field"><label for="b-handle">Handle</label><input type="text" id="b-handle" data-brand="handle" value="${esc(b.handle)}"></div>
         <div class="field"><label for="b-extra">Line under your name</label><input type="text" id="b-extra" data-brand="extra" value="${esc(b.extra)}"><span class="hint">For example your title and brokerage.</span></div>
       </section>
-      <section><h2>Colours</h2><div class="colors">${C('bg','Background')}${C('card','Card')}${C('accent','Accent')}${C('ink','Text')}${C('soft','Soft tint')}</div></section>
+      <section><h2>Colours</h2><div class="colors">${C('bg','Background')}${C('card','Card')}${C('accent','Accent')}${C('ink','Text')}${C('soft','Soft tint')}${C('sage','Sage')}</div>
+        <div class="field"><span class="lbl">Background wash</span><div class="colors">${C('tint','Wash colour')}</div>
+          <label for="b-tint-s" style="font-size:13px;color:var(--muted)">Strength: <span id="tint-val">${esc(String(parseFloat(b.tintStrength)||0))}%</span></label>
+          <input type="range" id="b-tint-s" min="0" max="40" step="1" value="${esc(String(parseFloat(b.tintStrength)||0))}" data-brand="tintStrength" style="width:100%;accent-color:var(--accent)">
+          <span class="hint">A soft sage-mint layer over every slide background. Photos stay untouched. Set it to 0% to turn it off.</span></div></section>
       <section><h2>Fonts</h2>
         <div class="field"><label for="b-df">Headline font</label><input type="text" id="b-df" data-brand="displayFont" value="${esc(b.displayFont)}"><span class="hint">Any Google Fonts name, or a font you upload below.</span></div>
         <div class="field"><label for="b-bf">Body font</label><input type="text" id="b-bf" data-brand="bodyFont" value="${esc(b.bodyFont)}"></div>
         <div class="field"><label for="b-sf">Accent font</label><input type="text" id="b-sf" data-brand="scriptFont" value="${esc(b.scriptFont)}"><span class="hint">Optional. Used for the italic line. Leave empty to use the headline font in italics.</span></div>
+        <div class="field"><label for="b-tf">Jen’s Tips font</label><input type="text" id="b-tf" data-brand="tipsFont" value="${esc(b.tipsFont||'Great Vibes')}"><span class="hint">The calligraphic headline on Jen’s Tips slides. Try Great Vibes, Pinyon Script, Parisienne or Allura. Canva has all four.</span></div>
         <div class="field"><span class="lbl">Uploaded fonts</span>
           ${(b.fontFiles||[]).length?`<div class="row">${b.fontFiles.map((f,k)=>`<span class="badge">${esc(f.family)} <button class="btn small ghost" style="padding:0 6px;min-height:0" data-rm-font="${k}" aria-label="Remove ${esc(f.family)}">×</button></span>`).join('')}</div>`:''}
           <div class="row"><input type="text" id="font-fam" class="pill-input" placeholder="Font name"><label class="btn small" for="font-in">Upload font file</label><input type="file" id="font-in" accept=".ttf,.otf,.woff,.woff2" class="sr" data-fontfile></div>
@@ -1018,23 +1228,69 @@ function refreshBrandPreview(){
 }
 
 /* =========================== images =========================== */
-function downscale(file,max=1600){
+const PHOTO_MAX=1440, PHOTO_Q=.8;
+function downscale(file,max=PHOTO_MAX){
   return new Promise((res,rej)=>{
     const img=new Image(); const url=URL.createObjectURL(file);
     img.onload=()=>{ const k=Math.min(1,max/Math.max(img.width,img.height)); const c=document.createElement('canvas'); c.width=Math.round(img.width*k); c.height=Math.round(img.height*k);
-      c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); c.toBlob(b=>b?res(b):rej(new Error('encode')),'image/jpeg',.86); };
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); c.toBlob(b=>b?res(b):rej(new Error('encode')),'image/jpeg',PHOTO_Q); };
     img.onerror=()=>{ URL.revokeObjectURL(url); rej(new Error('read')); };
     img.src=url;
   });
 }
 const blobToData = b => new Promise(r=>{ const fr=new FileReader(); fr.onload=()=>r(fr.result); fr.readAsDataURL(b); });
-async function storeImage(file){
-  const blob = await downscale(file);
+async function storeImage(file){ return storeBlob(await downscale(file)); }
+/* Shrinks library photos saved at the old, larger size, and points any designs using them at the smaller copy. Runs once per photo. */
+async function compactLibrary(){
+  if(S.compacting) return;
+  const todo=S.photos.filter(p=>!p.compact && (p.assetId||p.data)); if(!todo.length) return;
+  S.compacting=true; let done=0, saved=0;
+  toast(`Making ${todo.length} photos more compact. Keep this page open for a minute.`);
+  for(const p0 of todo){
+    const p=S.photos.find(x=>x.id===p0.id); if(!p) continue;
+    try{
+      const r=await fetch(imgSrc(p.assetId,p.data)); if(!r.ok) continue;
+      const big=await r.blob(), small=await downscale(big);
+      if(small.size >= big.size*0.9){ await Store.updatePhoto({...p, compact:true}); continue; }
+      const st=await storeBlob(small);
+      const np={...p, assetId:st.id, data:st.data, compact:true};
+      S.carousels.forEach(c=>{ let ch=false; (c.slides||[]).forEach(s=>{ if((p.assetId && s.photoId===p.assetId) || (!p.assetId && p.data && s.photoData===p.data)){ s.photoId=np.assetId; s.photoData=np.assetId?'':np.data; ch=true; } }); if(ch) Store.queueCarousel(c,0); });
+      await Store.updatePhoto(np); done++; saved+=big.size-small.size;
+    }catch(e){}
+  }
+  S.compacting=false;
+  if(done){ toast(`${done} photos made smaller, saving about ${(saved/1048576).toFixed(1)} MB`); if(S.view==='photos'||S.view==='used') render(); }
+}
+async function storeBlob(blob){
   const assets = await getCap('assets');
   if(assets){ try{ const a = await assets.upload(blob); return {id:a.id, data:''}; }catch(e){} }
   return {id:'', data: await blobToData(blob)};
 }
-function loadImg(src){ return new Promise(r=>{ const i=new Image(); if(!src.startsWith('data:')) i.crossOrigin='anonymous'; i.onload=()=>r(i); i.onerror=()=>r(null); i.src=src; }); }
+function loadImg(src){ return new Promise(r=>{ const i=new Image(); if(!src.startsWith('data:')&&!src.startsWith('blob:')) i.crossOrigin='anonymous'; i.onload=()=>r(i); i.onerror=()=>r(null); i.src=src; }); }
+/* ---- duplicate photo check: a small "fingerprint" of each picture, so re-saved or resized copies still match ---- */
+const DUP_LIMIT = 26, hashCache = {};
+async function imgHash(src){
+  if(!src) return '';
+  const img=await loadImg(src); if(!img) return '';
+  try{
+    const c1=document.createElement('canvas'); c1.width=68; c1.height=64; const x1=c1.getContext('2d'); x1.imageSmoothingQuality='high'; x1.drawImage(img,0,0,68,64);
+    const c=document.createElement('canvas'); c.width=17; c.height=16; const x=c.getContext('2d'); x.imageSmoothingQuality='high'; x.drawImage(c1,0,0,17,16);
+    const d=x.getImageData(0,0,17,16).data, g=i=>d[i*4]*.299+d[i*4+1]*.587+d[i*4+2]*.114;
+    let hex='', nib=0, n=0;
+    for(let r=0;r<16;r++) for(let col=0;col<16;col++){ nib=(nib<<1)|(g(r*17+col)>g(r*17+col+1)?1:0); if(++n%4===0){ hex+=nib.toString(16); nib=0; } }
+    return hex;
+  }catch(e){ return ''; }
+}
+function hashDist(a,b){ if(!a||!b||a.length!==b.length) return 999; let n=0; for(let i=0;i<a.length;i++){ let v=parseInt(a[i],16)^parseInt(b[i],16); while(v){ n+=v&1; v>>=1; } } return n; }
+async function libraryHashes(){
+  const out=[];
+  for(const p of S.photos){
+    let h=p.phash||hashCache[p.id];
+    if(!h){ h=await imgHash(imgSrc(p.assetId,p.data)); if(h){ hashCache[p.id]=h; Store.updatePhoto({...p, phash:h}); } }
+    if(h) out.push({id:p.id,h});
+  }
+  return out;
+}
 async function cropToData(src, tw, th){
   const img=await loadImg(src); if(!img) return '';
   const c=document.createElement('canvas'); c.width=tw; c.height=th;
@@ -1106,7 +1362,7 @@ async function exportBackup(){
 async function importBackup(file){
   let j; try{ j=JSON.parse(await file.text()); }catch(e){ j=null; }
   if(!j || j.app!=='content-studio'){ toast('That file isn’t a Content Studio backup.'); return; }
-  if(!confirm('Replace everything in this studio with the backup? Designs, ideas, photos and brand settings here will be overwritten.')) return;
+  if(!(await askConfirm('Replace everything in this studio with the backup? Designs, ideas, photos and brand settings here will be overwritten.','Replace'))) return;
   S.ideas=j.ideas||[]; S.carousels=j.carousels||[]; S.photos=j.photos||[]; S.brand={...clone(DEFAULT_BRAND), ...(j.brand||{})};
   for(const k of ['ideas','carousels','photos','brand']) await Store.saveLocal(k,true);
   applyBrand(); render(); toast(`Backup restored: ${S.carousels.length} designs, ${S.ideas.length} ideas, ${S.photos.length} photos`);
@@ -1162,6 +1418,12 @@ async function exportPptx(){
         const radius=parseFloat(cs.borderTopLeftRadius)||0;
         const isCircle = radius>=Math.min(r.width,r.height)/2-1 && Math.abs(r.width-r.height)<3;
         const hasFill=bg&&bg.a>0.01, hasLine=bw>0.5&&bc&&bc.a>0.01;
+        if(el.classList.contains('split-ph')){
+          const u=bgUrl(el);
+          if(u){ const data=await cropToData(u, Math.round(r.width), Math.round(r.height)); if(data) sl.addImage({data,...b}); }
+          else sl.addShape(pptx.ShapeType.rect,{...b, fill:{color:hex(parseColor(S.brand.soft))}});
+          continue;
+        }
         const img=el.classList.contains('headshot')?bgUrl(el):'';
         if(el.classList.contains('headshot')){
           const ring = hasLine ? hex(mix(bc,behind,op)) : null;
@@ -1245,13 +1507,14 @@ Hook: ${idea.hook||''}
 Facts (the ONLY facts you may use; never add numbers, dates, amounts or rules that are not here, and do not change any number):
 ${(idea.facts||[]).map(f=>'- '+f).join('\n')}
 Write 5 to 7 slides. Tone: warm, welcoming, expert, plain language, fun but not jokey. Keep headlines short (under 8 words) and body text under 30 words.
-Available layouts: "cover" (first slide), "statement", "list" (items array, 2 to 5 short items), "steps" (only if the order truly matters), "stat" (one big number copied exactly from the facts, in "number"), "mythfact" ("myth" and "fact"), "cta" (last slide; invite them to send a DM).
-Respond with JSON only: {"slides":[{"layout":"cover","heading":"","accent":"","body":"","items":[],"number":"","myth":"","fact":"","button":""}]}`;
+Available layouts: "cover" (first slide), "statement", "list" (items array, 2 to 5 short items), "checklist" (items array, 2 to 5 short items to tick off), "steps" (only if the order truly matters), "stat" (one big number copied exactly from the facts, in "number"), "tip" (a short label like "Tip 1" in "number", plus heading and body), "compare" ("leftTitle" like "Do this", "items" for it, "rightTitle" like "Not this", "items2" for it), "mythfact" ("myth" and "fact"), "cta" (last slide; invite them to send a DM).
+Respond with JSON only: {"slides":[{"layout":"cover","heading":"","accent":"","body":"","items":[],"items2":[],"leftTitle":"","rightTitle":"","number":"","myth":"","fact":"","button":""}]}`;
     const res=await sample.json(prompt,{modelTier:'default'});
     const bgs=['sand','white','sand','taupe','white','sand'];
     let slides=(res&&Array.isArray(res.slides)?res.slides:[]).filter(s=>s&&LAYOUTS[s.layout]).slice(0,8).map((s,k)=>({
       id:uid('s'),layout:s.layout,bg:s.layout==='cover'?'photo':s.layout==='cta'?'white':bgs[k%bgs.length],
-      heading:s.heading||'',accent:s.accent||'',body:s.body||'',items:Array.isArray(s.items)?s.items.map(String):[],number:s.number||'',myth:s.myth||'',fact:s.fact||'',button:s.button||''}));
+      heading:s.heading||'',accent:s.accent||'',body:s.body||'',items:Array.isArray(s.items)?s.items.map(String):[],number:s.number||'',myth:s.myth||'',fact:s.fact||'',button:s.button||'',items2:Array.isArray(s.items2)?s.items2.map(String):[],leftTitle:s.leftTitle||'',rightTitle:s.rightTitle||''}));
+    slides.forEach(s=>{ if(s.layout==='cta' && s.heading!==JEN_TIPS){ if(s.heading && !s.accent) s.accent=s.heading; s.heading=JEN_TIPS; } });
     if(slides.length<2) slides=templateFromIdea(idea);
     if(idea.footnote) slides[slides.length-1].footnote=idea.footnote;
     S.busy['mk'+idea.id]=false;
@@ -1267,12 +1530,24 @@ function templateFromIdea(idea){
   return [
     {id:uid('s'),layout:'cover',bg:'photo',heading:idea.title,accent:'',body:'',button:'Swipe for more',items:[]},
     {id:uid('s'),layout:'list',bg:'sand',heading:'What to know',items:(idea.facts||[]).slice(0,4),body:''},
-    {id:uid('s'),layout:'cta',bg:'white',heading:'Questions? Let’s talk.',body:'Send me a message and we’ll go through it together.',button:'Send me a DM',items:[],footnote:idea.footnote||''}
+    {id:uid('s'),layout:'cta',bg:'white',heading:JEN_TIPS,accent:'Questions? Let’s talk.',body:'Send me a message and we’ll go through it together.',button:'Send me a DM',items:[],footnote:idea.footnote||''}
   ];
 }
 
 /* =========================== dialogs =========================== */
 function showDialog(html){ const d=$('#dlg'); d.innerHTML=html; if(!d.open) d.showModal(); }
+/* In-page yes/no box. The browser's own confirm() pop-up is blocked inside the published page, so it silently said no. */
+function askConfirm(msg, ok='Delete', danger=true){
+  return new Promise(res=>{
+    let d=document.getElementById('cfm');
+    if(!d){ d=document.createElement('dialog'); d.id='cfm'; d.style.width='min(440px,calc(100vw - 32px))'; document.body.appendChild(d); }
+    d.innerHTML=`<p style="margin:0 0 18px;font-size:16px;line-height:1.45">${esc(msg)}</p><div class="row end"><button class="btn ghost" type="button" data-cfm="0">Cancel</button><button class="btn ${danger?'pill-del':'primary'}" type="button" data-cfm="1">${esc(ok)}</button></div>`;
+    let settled=false; const done=v=>{ if(settled) return; settled=true; if(d.open) d.close(); res(v); };
+    d.querySelectorAll('[data-cfm]').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); done(b.dataset.cfm==='1'); }));
+    d.addEventListener('cancel',e=>{ e.preventDefault(); done(false); },{once:true});
+    d.showModal(); d.querySelector('[data-cfm="0"]').focus();
+  });
+}
 function closeDialog(){ const d=$('#dlg'); if(d.open) d.close(); }
 function ideaDialog(idea){
   const i=idea||{status:'research'};
@@ -1297,7 +1572,7 @@ function ideaDialog(idea){
       order: idea?idea.order:Date.now(), createdAt: idea?idea.createdAt:new Date().toISOString()};
     Store.putIdea(next); closeDialog(); render(); toast(idea?'Idea saved':'Idea added');
   });
-  const del=$('[data-del-idea]'); if(del) del.addEventListener('click',()=>{ if(confirm('Delete this idea for good?')){ Store.delIdea(idea.id); closeDialog(); render(); } });
+  const del=$('[data-del-idea]'); if(del) del.addEventListener('click',async e=>{ e.stopPropagation(); if(await askConfirm('Delete this idea for good?')){ Store.delIdea(idea.id); closeDialog(); render(); toast('Idea deleted'); } });
 }
 function usedDialog(idea){
   showDialog(`<h2>${idea.status==='used'?'Edit post details':'Mark as used'}</h2><form id="used-form">
@@ -1319,11 +1594,18 @@ function usedDialog(idea){
 /* =========================== events =========================== */
 document.addEventListener('click', async e=>{
   const t=e.target.closest('button,[data-open]'); if(!t) return;
+  if(Date.now()<suppressClickUntil){ e.preventDefault(); return; }
   const d=t.dataset;
   if(d.close!==undefined){ closeDialog(); return; }
   if(d.nav){ go(d.nav); return; }
   if(d.open){ openEditor(d.open); return; }
   if(d.slide!==undefined){ S.slideIdx=+d.slide; S.sel=null; render(); return; }
+  if(d.delThumb!==undefined){ removeSlide(+d.delThumb); return; }
+  if(d.dupThumb!==undefined){ dupSlide(+d.dupThumb); return; }
+  if(d.delDesign){ const c=S.carousels.find(x=>x.id===d.delDesign); if(c && await askConfirm(`Delete “${c.title||'Untitled'}” for good?`)){ await Store.delCarousel(c.id); render(); toast('Deleted'); } return; }
+  if(d.markPosted){ const c=S.carousels.find(x=>x.id===d.markPosted); if(c) postedDialog(c); return; }
+  if(d.unpost){ unpost(S.carousels.find(x=>x.id===d.unpost)); return; }
+  if(d.usedTab){ S.usedTab=d.usedTab; render(); return; }
   if(d.filter){ S.ideaFilter=d.filter; render(); return; }
   if(d.storyCopy){ const c=S.carousels.find(x=>x.id===d.storyCopy); if(c) copyDesign(c.id, fmtOf(c)==='story'?'post':'story'); return; }
   if(d.dup){ copyDesign(d.dup); return; }
@@ -1336,7 +1618,7 @@ document.addEventListener('click', async e=>{
   if(d.newFromPhoto){ const p=libraryPhotos().find(x=>x.id===d.newFromPhoto); if(p) newDesign({kind:'single',slides:[{id:uid('s'),layout:'cover',bg:'photo',heading:'Your headline here',accent:'a short supporting line',items:[],photoId:p.assetId||'',photoData:p.assetId?'':(p.data||'')}]}); return; }
   if(d.photoCat){ S.photoCat=d.photoCat; render(); return; }
   if(d.pickCat){ S.pickCat=d.pickCat; photoPicker(); return; }
-  if(d.delPhoto){ const p=S.photos.find(x=>x.id===d.delPhoto); const n=(usageMap()[p&&(p.assetId||p.data)]||0); if(p && confirm(n?`This photo is ${usedLabel(n).toLowerCase()}. Delete it anyway? Those posts will lose their background photo.`:'Delete this photo?')){
+  if(d.delPhoto){ const p=S.photos.find(x=>x.id===d.delPhoto); const u=usageMap()[p&&(p.assetId||p.data)]||{posted:0,drafts:0}, n=u.posted+u.drafts; if(p && await askConfirm(n?`This photo is ${usedLabel(n).toLowerCase()}. Delete it anyway? Those posts will lose their background photo.`:'Delete this photo?')){
       if(p.assetId){ const a=await getCap('assets'); if(a){ try{ await a.delete(p.assetId); }catch(err){} } }
       S.carousels.forEach(c=>{ let ch=false; (c.slides||[]).forEach(s=>{ if((p.assetId&&s.photoId===p.assetId)||(p.data&&s.photoData===p.data)){ s.photoId=''; s.photoData=''; ch=true; } }); if(ch) Store.queueCarousel(c,0); });
       await Store.delPhoto(p.id); render(); toast('Photo deleted'); } return; }
@@ -1344,13 +1626,22 @@ document.addEventListener('click', async e=>{
   if(d.dl){ closeDialog(); if(d.dl==='pptx') exportPptx(); else if(d.dl==='png-one') exportPNG([S.slideIdx]); else exportPNG(curCar().slides.map((_,k)=>k)); return; }
   if(d.fmt){ const car=curCar(); if(car && fmtOf(car)!==d.fmt){ car.format=d.fmt; Store.queueCarousel(car); render(); } return; }
   if(d.align){ setAlign(d.align); return; }
-  if(d.layout||d.bg){ const car=curCar(); const s=car.slides[S.slideIdx]; if(d.layout){ s.layout=d.layout; S.sel=null; } if(d.bg) s.bg=d.bg; Store.queueCarousel(car); render(); if(d.bg==='photo' && !imgSrc(s.photoId,s.photoData)) photoPicker(); return; }
+  if(d.layout||d.bg){ const car=curCar(); const s=car.slides[S.slideIdx];
+    if(d.layout){ s.layout=d.layout; S.sel=null;
+      if(d.layout==='compare'){ s.leftTitle=s.leftTitle||'Do this'; s.rightTitle=s.rightTitle||'Not this'; }
+      if(d.layout==='tip' && !s.number) s.number='Tip 1';
+      if(d.layout==='split' && (s.bg||'sand')==='photo') s.bg='white';
+      if(d.layout==='cta'){ const old=(s.heading||'').trim(); if(old!==JEN_TIPS){ if(old && old!=='Your headline here' && !s.accent) s.accent=old; s.heading=JEN_TIPS; } s.pos={}; s.align={}; } }
+    if(d.bg) s.bg=d.bg;
+    Store.queueCarousel(car); render();
+    if(((d.bg==='photo' && s.layout!=='split') || (d.layout==='split')) && !imgSrc(s.photoId,s.photoData)) photoPicker();
+    return; }
   if(d.rmFont!==undefined){ S.brand.fontFiles.splice(+d.rmFont,1); applyBrand(); Store.queueBrand(); render(); return; }
   const car=curCar();
   switch(d.act){
     case 'new-car': newDesign({kind:'carousel'}); break;
     case 'new-single': newDesign({kind:'single'}); break;
-    case 'to-carousel': car.kind='carousel'; car.slides.push({id:uid('s'),layout:'cta',bg:'white',heading:'Questions? Let’s talk.',body:'Send me a message any time.',button:'Send me a DM',items:[]}); Store.queueCarousel(car); render(); toast('Now a carousel. It’s in the Carousels section.'); break;
+    case 'to-carousel': car.kind='carousel'; car.slides.push({id:uid('s'),layout:'cta',bg:'white',heading:JEN_TIPS,accent:'Questions? Let’s talk.',body:'Send me a message any time.',button:'Send me a DM',items:[]}); Store.queueCarousel(car); render(); toast('Now a carousel. It’s in the Carousels section.'); break;
     case 'add-idea': ideaDialog(null); break;
     case 'brainstorm': brainstorm(); break;
     case 'download': downloadDialog(); break;
@@ -1363,12 +1654,13 @@ document.addEventListener('click', async e=>{
     case 'prev': S.slideIdx=Math.max(0,S.slideIdx-1); S.sel=null; render(); break;
     case 'next': S.slideIdx=Math.min(car.slides.length-1,S.slideIdx+1); S.sel=null; render(); break;
     case 'add-slide': car.slides.splice(S.slideIdx+1,0,{id:uid('s'),layout:'statement',bg:'sand',heading:'New slide',body:'',items:[]}); S.slideIdx++; S.sel=null; Store.queueCarousel(car); render(); break;
-    case 'dup-slide': car.slides.splice(S.slideIdx+1,0,{...clone(car.slides[S.slideIdx]),id:uid('s')}); S.slideIdx++; Store.queueCarousel(car); render(); break;
+    case 'dup-slide': dupSlide(S.slideIdx); break;
     case 'up-slide': if(S.slideIdx>0){ const k=S.slideIdx; [car.slides[k-1],car.slides[k]]=[car.slides[k],car.slides[k-1]]; S.slideIdx--; Store.queueCarousel(car); render(); } break;
     case 'down-slide': if(S.slideIdx<car.slides.length-1){ const k=S.slideIdx; [car.slides[k+1],car.slides[k]]=[car.slides[k],car.slides[k+1]]; S.slideIdx++; Store.queueCarousel(car); render(); } break;
-    case 'del-slide': if(car.slides.length<=1){ toast('A design needs at least one slide.'); break; } if(confirm('Delete this slide?')){ car.slides.splice(S.slideIdx,1); S.sel=null; Store.queueCarousel(car); render(); } break;
+    case 'del-slide': removeSlide(S.slideIdx); break;
+    case 'unpost': unpost(car); break;
     case 'rm-photo': { const s=curSlide(); s.photoId=''; s.photoData=''; Store.queueCarousel(car); render(); break; }
-    case 'del-car': if(confirm('Delete this design for good?')){ const kind=car.kind; await Store.delCarousel(car.id); go(kind==='single'?'singles':'carousels'); toast('Deleted'); } break;
+    case 'del-car': if(await askConfirm(`Delete “${car.title||'Untitled'}” for good?`)){ const kind=car.kind, wasPosted=!!car.posted; await Store.delCarousel(car.id); go(wasPosted?'used':kind==='single'?'singles':'carousels'); toast('Deleted'); } break;
     case 'backup': exportBackup(); break;
     case 'rm-headshot': S.brand.headshotId=''; S.brand.headshotData=''; Store.queueBrand(); render(); break;
   }
@@ -1376,11 +1668,11 @@ document.addEventListener('click', async e=>{
 document.addEventListener('input', e=>{
   const t=e.target, d=t.dataset;
   if(d.field!==undefined){ const car=curCar(); if(!car) return; const s=car.slides[S.slideIdx];
-    s[d.field] = d.field==='items' ? t.value.split('\n') : t.value; Store.queueCarousel(car); refreshPreview(); return; }
+    s[d.field] = (d.field==='items'||d.field==='items2') ? t.value.split('\n') : t.value; Store.queueCarousel(car); refreshPreview(); return; }
   if(d.carTitle!==undefined){ const car=curCar(); car.title=t.value; Store.queueCarousel(car); return; }
   if(d.bs!==undefined){ S.bsTheme=t.value; return; }
   if(d.usedQ!==undefined){ S.usedQuery=t.value; const pos=t.selectionStart; render(); const n=$('#used-q'); n.focus(); n.setSelectionRange(pos,pos); return; }
-  if(d.brand){ S.brand[d.brand]=t.value; if(d.brand.endsWith('Font')) loadGoogleFontDebounced(t.value); $('#bm-name').textContent=S.brand.name||'Content Studio'; Store.queueBrand(); refreshBrandPreview(); return; }
+  if(d.brand){ S.brand[d.brand]=t.value; if(d.brand==='tintStrength'){ const v=$('#tint-val'); if(v) v.textContent=t.value+'%'; } if(d.brand.endsWith('Font')) loadGoogleFontDebounced(t.value); $('#bm-name').textContent=S.brand.name||'Content Studio'; Store.queueBrand(); refreshBrandPreview(); return; }
   if(d.color){ S.brand[d.color]=t.value; const tx=document.querySelector(`[data-color-text="${d.color}"]`); if(tx) tx.value=t.value; Store.queueBrand(); refreshBrandPreview(); return; }
   if(d.colorText){ let v=t.value.trim(); if(/^[0-9a-fA-F]{6}$/.test(v)) v='#'+v; if(/^#[0-9a-fA-F]{6}$/.test(v)){ S.brand[d.colorText]=v; const c=document.querySelector(`[data-color="${d.colorText}"]`); if(c) c.value=v; Store.queueBrand(); refreshBrandPreview(); } return; }
 });
@@ -1388,9 +1680,10 @@ let gfTimer; function loadGoogleFontDebounced(v){ clearTimeout(gfTimer); gfTimer
 document.addEventListener('change', async e=>{
   const t=e.target, d=t.dataset;
   if(d.count!==undefined){ setCount(parseInt(t.value,10)); return; }
+  if(d.handle!==undefined){ const car=curCar(), s=curSlide(); if(s){ s.showHandle=t.checked; Store.queueCarousel(car); refreshPreview(); } return; }
   if(d.movePhoto){ const p=S.photos.find(x=>x.id===d.movePhoto); if(p && PHOTO_CATS[t.value]){ await Store.updatePhoto({...p,category:t.value}); render(); toast(`Moved to ${PHOTO_CATS[t.value]}`); } return; }
   if(d.photoUpload!==undefined && t.files.length){ await uploadPhotos([...t.files], S.photoCat); t.value=''; if(S.view==='photos') render(); updateCounts(); return; }
-  if(d.pickUpload!==undefined && t.files.length){ const added=await uploadPhotos([...t.files], S.pickCat); if(added.length) applyPhoto(added[0]); return; }
+  if(d.pickUpload!==undefined && t.files.length){ const added=await uploadPhotos([...t.files], S.pickCat==='all'?'interior':S.pickCat); if(added.length) applyPhoto(added[0]); return; }
   if(d.headshot!==undefined && t.files[0]){ try{ const r=await storeImage(t.files[0]); S.brand.headshotId=r.id; S.brand.headshotData=r.data; Store.queueBrand(); render(); toast('Headshot added'); }catch(err){ toast('That image couldn’t be read. Try a JPG or PNG.'); } return; }
   if(d.restoreFile!==undefined && t.files[0]){ await importBackup(t.files[0]); t.value=''; return; }
   if(d.fontfile!==undefined && t.files[0]){
@@ -1419,7 +1712,7 @@ document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==
 
 /* =========================== start =========================== */
 render(); applyBrand();
-Store.init().then(()=>{ S.mode=Store.mode; applyBrand(); render(); });
+Store.init().then(()=>{ S.mode=Store.mode; applyBrand(); render(); setTimeout(compactLibrary, 4000); });
 </script>
 </body>
 </html>
